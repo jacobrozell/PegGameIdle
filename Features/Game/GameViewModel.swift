@@ -228,6 +228,18 @@ public final class GameViewModel {
     public func dismissOfflineReport() { offlineReport = nil }
     public func dismissBoardResult() { lastBoardResult = nil }
 
+    /// Wipes all saved progress (Phase 8.7: delete all local data) and starts
+    /// the player over with a fresh board.
+    public func resetAllProgress() {
+        repository.reset()
+        state = repository.load()
+        currentBoardEarnings = 0
+        offlineReport = nil
+        lastBoardResult = nil
+        dailyResult = nil
+        dealNormalBoard()
+    }
+
     // MARK: Upgrades
 
     public func purchase(_ kind: UpgradeKind) {

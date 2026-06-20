@@ -5,12 +5,15 @@ import PegGameDomain
 /// The core journey screen: play the board, watch idle earnings, buy upgrades.
 public struct GameView: View {
     @State private var viewModel: GameViewModel
+    @State private var settingsViewModel: SettingsViewModel
+    @State private var showingSettings = false
 
     /// Drives the foreground Auto-Jumper. One tick per second.
     private let tick = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    public init(repository: GameStateRepository) {
+    public init(repository: GameStateRepository, settingsStore: SettingsStore) {
         _viewModel = State(initialValue: GameViewModel(repository: repository))
+        _settingsViewModel = State(initialValue: SettingsViewModel(store: settingsStore))
     }
 
     public var body: some View {
@@ -27,7 +30,21 @@ public struct GameView: View {
                 }
             }
             .navigationTitle("Peg Game Idle")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingSettings = true
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                    .accessibilityLabel("Settings")
+                    .accessibilityIdentifier("settings-button")
+                }
+            }
             .onReceive(tick) { _ in viewModel.tickAutoJumper(seconds: 1) }
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView(viewModel: settingsViewModel, gameViewModel: viewModel)
         }
         .alert("Welcome back!", isPresented: offlineBinding) {
             Button("Collect", action: viewModel.dismissOfflineReport)

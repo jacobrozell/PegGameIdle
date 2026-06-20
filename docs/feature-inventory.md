@@ -19,7 +19,10 @@
 | Reset-state / disable-telemetry launch args | ✅ shipped | `specs/system/test-plan.md` | `App/AppDependencies.swift` |
 | Larger board tiers (size 6+) | 🟡 partial | backlog | `BoardLayout(size:)` supports; UI classic-only |
 | Game Center leaderboards (fewest pegs) | ⛔ planned | backlog | daily board is deterministic; ready to layer on |
-| Settings / AppLinks / legal pages | ⛔ planned | — | — |
+| Settings screen (haptics/sound prefs, links, reset all data) | ✅ shipped | — | `Features/Settings/`, `Data/SettingsStore.swift` |
+| AppLinks registry (privacy/support/accessibility, tip jar hidden) | ✅ shipped | — | `Support/AppLinks.swift` |
+| CI (domain tests + app build on push) | ✅ shipped | `specs/system/test-plan.md` | `.github/workflows/ci.yml` |
+| Legal HTML pages + GitHub Pages hosting | ⛔ planned | — | AppLinks URLs point here (Phase 15) |
 | Localization (multi-locale) | ⛔ planned | — | en strings inline |
 | Telemetry / analytics | ⛔ planned (v1 = none) | — | — |
 | Haptics / sound / cosmetics | ⛔ planned | — | — |

@@ -6,7 +6,10 @@ struct PegGameIdleApp: App {
 
     var body: some Scene {
         WindowGroup {
-            GameView(repository: dependencies.gameStateRepository)
+            GameView(
+                repository: dependencies.gameStateRepository,
+                settingsStore: dependencies.settingsStore
+            )
         }
     }
 }

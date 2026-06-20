@@ -30,6 +30,7 @@ targets:
       - Features
       - DesignSystem
       - Data
+      - Support
       - Resources
     dependencies:
       - package: PegGameDomain
