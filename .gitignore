@@ -1,0 +1,25 @@
+# Xcode / generated project — project.yml is the source of truth.
+*.xcodeproj
+*.xcworkspace
+!default.xcworkspace
+xcuserdata/
+DerivedData/
+build/
+.build/
+*.xcscmblueprint
+*.xccheckout
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+
+# Secrets — never commit signing or service credentials.
+*.mobileprovision
+*.p12
+*.cer
+GoogleService-Info.plist
+Secrets.xcconfig
+*.env
