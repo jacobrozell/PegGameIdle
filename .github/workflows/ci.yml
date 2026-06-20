@@ -39,18 +39,12 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-      # Pick an available iPhone simulator on the runner (names vary by Xcode).
-      - name: Choose simulator
-        id: sim
-        run: |
-          NAME=$(xcrun simctl list devices available -j | python3 -c "import json,sys; d=json.load(sys.stdin)['devices']; print(next((dev['name'] for r in d for dev in d[r] if dev.get('isAvailable') and 'iPhone' in dev['name']), ''))")
-          echo "Using simulator: ${NAME:-<none found>}"
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
-
       # Build the app and run the hosted unit tests (core features + drag).
+      # iPhone 16 ships with the latest-stable Xcode runtime used above.
       - name: Build & test app
         run: |
+          set -o pipefail
           xcodebuild test \
             -scheme PegGameIdleCI \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
             CODE_SIGNING_ALLOWED=NO
