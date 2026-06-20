@@ -17,6 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # XcodeGen emits the Xcode 16 project format, so pin a matching toolchain
+      # rather than the runner's older default (Xcode 15.4 can't read format 77).
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
       - name: Show toolchain
         run: |
           swift --version
