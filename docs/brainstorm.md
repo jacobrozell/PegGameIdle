@@ -22,13 +22,71 @@ Plain peg solitaire is a one-and-done puzzle. We layer an idle economy on top:
 - The human still matters: playing by hand is faster and more skillful than the
   idle baseline, and a perfect solve (one peg left) is the bragging-rights goal.
 
+## Gameflow mechanics — v1.x direction (decisions locked 2026-06-20)
+
+Still non-authoritative; promote to specs before building. These came out of a
+brainstorm on making scoring reward skill and giving daily reasons to return.
+
+### Locked decisions
+1. **Scoring = skill multiplier, no penalty.** You always keep the per-jump
+   points you earned. Finishing a board grants a *completion multiplier* based
+   on pegs remaining — sloppy boards just forgo the bonus, they never subtract
+   currency.
+2. **Input = drag-to-jump + tap fallback.** Drag a peg over a neighbor into the
+   empty hole (tactile path); keep tap-peg-then-tap-hole for VoiceOver / Switch
+   Control. Both call the same domain logic. Required to keep the WCAG gate.
+3. **Daily puzzle rewards prestige progress** (not a new currency). A daily
+   solve accelerates long-term prestige rather than paying spendable Peg Points.
+
+### Board lifecycle
+- **Auto-deal:** when no legal moves remain, show a short end-of-board tally
+  (pegs left → rank → payout), then deal a fresh board automatically.
+- Cracker Barrel ranks for flavor: 1 left = genius, 2 = purty smart,
+  3 = just plain dumb, 4+ = eg-no-ra-moose.
+
+### Completion multiplier (proposed numbers — tune later)
+
+| Pegs left | Rank | Board payout |
+|-----------|------|--------------|
+| 1 | Genius | ×5 |
+| 2 | Purty smart | ×3 |
+| 3 | Just plain dumb | ×2 |
+| 4 | Eg-no-ra-moose | ×1.25 |
+| 5+ | — | ×1 (jump points only) |
+
+- **Streak/combo (optional layer):** consecutive finishes with ≤2 pegs left
+  build a temporary multiplier that decays on a bad board. Gives skilled manual
+  play a ceiling the greedy Auto-Jumper can't reach.
+
+### Manual vs Auto-Jumper
+- Auto-Jumper = the floor: greedy AI, ~×1, no streak. Keeps idle income flowing.
+- Manual play = the ceiling: completion multipliers + streak.
+- **Open:** should the Auto-Jumper run its *own* board so it doesn't consume the
+  board you're mid-solve on? (Today it shares the human board.)
+
+### Daily puzzle
+- **Seeded by date** (`yyyy-MM-dd` → deterministic board); same for everyone
+  that day. Variant options: fixed non-standard empty hole, larger board, or a
+  pre-cleared "finish this" layout.
+- **Reward:** accelerates prestige progress (per locked decision #3). Design
+  options to pick from when specced:
+  - grant bonus lifetime-jumps toward the `√` prestige formula, or
+  - grant fractional prestige points directly, or
+  - a temporary post-daily prestige-gain multiplier.
+- **Streak:** miss a day → reset. Unlimited retries; credit best result, lock
+  the streak on the first qualifying solve.
+- Works fully offline; Game Center "fewest pegs" leaderboards layer on later
+  since the board is deterministic.
+
+### Backlog spice (not v1)
+- Special pegs (golden = bonus, locked = must clear last).
+- Board-size tiers as upgrades.
+- "Leave the center peg" challenge objectives.
+
 ## Backlog ideas (not in v1)
 
-- Prestige: reset for a permanent multiplier (`prestigeMultiplier` already in
-  the domain model, not yet surfaced).
 - Larger board tiers (size 6, 7…) as an upgrade — `BoardLayout(size:)` supports
   it; UI is classic-only for v1.
-- Combo bonuses for efficient solves.
-- Daily challenges / seeded boards.
 - Cosmetic peg skins, haptics, sound.
 - Game Center leaderboards for fewest pegs remaining.
+
