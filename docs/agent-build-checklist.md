@@ -55,7 +55,7 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 | 6c Gameflow mechanics | 2026-06-20 | _follow-up_ | Specs: scoring + daily-puzzle. Completion scoring (rank multiplier + streak + auto-deal), Auto-Jumper on its own board, drag-to-jump + tap fallback, date-seeded Daily Puzzle feeding prestige. +18 domain tests. UI unverified (no toolchain). |
 | 7 (partial) Adaptive layout | 2026-06-20 | _follow-up_ | iPad-landscape two-column vs stacked via `AdaptiveLayout` (idiom-based, +3 unit tests); offline "reserve full" cue. iPad side-by-side + Dynamic Type still need device QA. |
 | 8 (partial) Settings | 2026-06-20 | _follow-up_ | Settings sheet (haptics/sound prefs, About links, reset-all-data with confirm), `AppLinks` registry (tip jar nil/hidden), `SettingsStore` protocol + impls. |
-| 12 (partial) CI | 2026-06-20 | _follow-up_ | GitHub Actions: `swift test` (domain) + xcodegen + xcodebuild app build on push/PR. First real compile of the project. |
+| 12 (partial) CI | 2026-06-20 | _follow-up_ | GitHub Actions (latest-stable Xcode): `swift test` (domain, 48 green) + xcodegen + `xcodebuild test` running hosted app unit tests (player interaction + drag) on a simulator. |
 | Remaining | | | History/lists, localization, a11y hardening, full CI matrix, release gating, legal pages, release QA. |
 
 ---

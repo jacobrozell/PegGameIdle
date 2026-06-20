@@ -39,6 +39,19 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.peggameidle
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
 
+  # Hosted unit tests for app-layer logic (view models, drag, interaction).
+  # Fast — runs in the simulator without driving the UI.
+  PegGameIdleTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - Tests/Unit
+    dependencies:
+      - target: PegGameIdle
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.peggameidle.unittests
+
   PegGameIdleUITests:
     type: bundle.ui-testing
     platform: iOS
@@ -51,12 +64,13 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.peggameidle.uitests
 
 schemes:
-  # CI scheme: fast feedback. Domain unit tests run via `swift test`; this
-  # scheme covers the app build + UI smoke.
+  # CI scheme: fast feedback. Pure logic also runs via `swift test`; this scheme
+  # builds the app and runs the hosted unit tests (core features + drag).
   PegGameIdleCI:
     build:
       targets:
         PegGameIdle: all
+        PegGameIdleTests: [test]
     test:
       targets:
-        - PegGameIdleUITests
+        - PegGameIdleTests

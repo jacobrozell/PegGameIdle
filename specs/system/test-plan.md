@@ -3,8 +3,13 @@
 ## Layers
 - **Domain unit tests** (`Tests/PegGameDomainTests`) — pure logic. Run with
   `swift test`. No simulator; CI/Linux-safe. This is the primary safety net.
+- **App unit tests** (`Tests/Unit`, hosted target `PegGameIdleTests`) — exercise
+  view-model logic: tap/drag interaction, jump scoring, Auto-Jumper isolation,
+  upgrades, daily mode, reset. Run via `xcodebuild test` on a simulator; fast
+  because they drive the model, not the UI.
 - **UI smoke** (`Tests/UI`) — XCUITest proving the core screen launches and key
-  controls (by accessibility identifier) exist. Requires a simulator.
+  controls (by accessibility identifier) exist. Requires a simulator; not in PR
+  CI yet (nightly candidate).
 
 ## What domain tests cover today
 - Board: hole/peg counts, opening moves, legal/illegal/non-adjacent jumps, win
@@ -16,8 +21,10 @@
   capped), Codable round-trip.
 
 ## CI scheme
-- `PegGameIdleCI` builds the app + runs UI smoke (minutes-scale).
-- Domain tests run as a separate, faster `swift test` job.
+- `.github/workflows/ci.yml` (macos-14, pinned latest-stable Xcode): runs
+  `swift test` (domain), then `xcodegen generate`, then `xcodebuild test` for the
+  `PegGameIdleCI` scheme (app build + hosted unit tests) on a discovered iPhone
+  simulator.
 
 ## Launch arguments (for deterministic UI runs)
 - `-reset_state` — clear persisted progress before launch.
