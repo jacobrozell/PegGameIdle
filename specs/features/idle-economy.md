@@ -37,6 +37,21 @@ On return, if the Auto-Jumper earned anything, show a one-shot alert:
 jumps cleared + PP banked. `wasCapped` is tracked (UI may surface "reserve full"
 later). Dismiss credits nothing extra (already credited).
 
+## Prestige
+- **Pending points** = `floor(sqrt(totalPegsJumped / 500)) − prestigePointsClaimed`.
+- Each banked point adds `0.1` to the permanent `prestigeMultiplier`
+  (1 point → 1.1×, 2 → 1.2×, …), applied to every future reward.
+- **Prestige** is offered (button + confirmation dialog) once ≥ 1 point is
+  pending. It banks all pending points, then **resets** `pegPoints` and
+  `upgradeLevels`. Lifetime `totalPegsJumped` persists so prestige value never
+  goes backward.
+- Pure logic: `EconomyEngine.pendingPrestige / canPrestige / projectedMultiplier
+  / prestige`.
+
+## Number formatting
+Large values display compactly (`1.23K`, `2.5M`, `1B`) via
+`NumberFormatting.compact` — pure and locale-independent for stable tests.
+
 ## Persistence
 `GameState` (pegPoints, prestigeMultiplier, totalPegsJumped, upgradeLevels,
 lastSeen) is saved on every economy mutation via `GameStateRepository`.
@@ -47,9 +62,8 @@ lastSeen) is saved on every economy mutation via `GameStateRepository`.
   hinted when unaffordable.
 
 ## Open / backlog
-- Prestige reset surfacing `prestigeMultiplier`.
 - Auto-Jumper auto-resetting its own board independent of the human board.
-- Number formatting for large values (K/M/B).
+- "Reserve full" surfacing when offline earnings are capped (`wasCapped`).
 
 ---
 

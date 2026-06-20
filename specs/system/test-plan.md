@@ -24,9 +24,9 @@
 - `-disable_telemetry` — no analytics in tests (telemetry is off in v1 anyway).
 - (Future) `-enable_full_product_surface` — expose gated features for CI/dogfood.
 
-> **Note:** `-reset_state` / `-disable_telemetry` are referenced by the UI smoke
-> test but not yet honored in `AppDependencies`/`PegGameIdleApp`. Wiring them is
-> the first follow-up so the UI smoke is truly deterministic.
+`-reset_state` and `-disable_telemetry` are honored in `AppDependencies.live()`:
+the former wipes persisted progress before launch, the latter forces telemetry
+off (which is already the v1 default). `PegGameIdleApp` uses `AppDependencies.live()`.
 
 ## Future (Phase 12)
 Split UI targets (`*UISmoke`, `*UIFeatures`, `*UIAccessibility`,

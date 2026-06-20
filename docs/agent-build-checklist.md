@@ -51,6 +51,7 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 | 4 Persistence | 2026-06-20 | _initial_ | Repository protocol + UserDefaults/in-memory impls. SwiftData migration deferred. |
 | 5 App shell | 2026-06-20 | _initial_ | `@main`, AppDependencies, NavigationStack. Router/onboarding/flags open. |
 | 6 First vertical slice | 2026-06-20 | _initial_ | entry → play board → earn → persist → offline reconcile. Integration test open. |
+| 6b Prestige + polish | 2026-06-20 | _follow-up_ | Prestige loop (bank points → permanent multiplier), compact K/M/B formatting, `-reset_state`/`-disable_telemetry` launch args honored. +12 domain tests. |
 | 7–18 | | | Not started — see below. |
 
 ---
@@ -100,6 +101,7 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 ### Phase 5 — App shell
 - [x] 5.1 `@main` + bootstrap
 - [x] 5.2 Root navigation (NavigationStack)
+- [x] 5.5 Launch-argument handling (`-reset_state`, `-disable_telemetry`) in `AppDependencies.live()`
 - [ ] 5.3 Router for deep links
 - [ ] 5.4 Onboarding
 - [ ] 5.6 Release-surface gate module

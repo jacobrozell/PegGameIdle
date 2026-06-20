@@ -35,6 +35,46 @@ public enum EconomyEngine {
         return next
     }
 
+    // MARK: Prestige
+
+    /// Lifetime jumps required to bank one prestige point (the resource that
+    /// permanently raises the global multiplier).
+    public static let jumpsPerPrestigePoint: Double = 500
+
+    /// Each banked prestige point adds this much to the global multiplier.
+    public static let prestigeMultiplierPerPoint: Double = 0.1
+
+    /// Prestige points currently available to claim (beyond those already banked).
+    public static func pendingPrestige(in state: GameState) -> Double {
+        let earnable = (Double(state.totalPegsJumped) / jumpsPerPrestigePoint).squareRoot().rounded(.down)
+        return max(0, earnable - state.prestigePointsClaimed)
+    }
+
+    public static func canPrestige(_ state: GameState) -> Bool {
+        pendingPrestige(in: state) >= 1
+    }
+
+    /// The multiplier the player would have after prestiging right now.
+    public static func projectedMultiplier(after state: GameState) -> Double {
+        let total = state.prestigePointsClaimed + pendingPrestige(in: state)
+        return 1 + total * prestigeMultiplierPerPoint
+    }
+
+    /// Banks pending prestige points: raises the permanent multiplier and resets
+    /// spendable progress (Peg Points + upgrade levels). Lifetime jumps are kept
+    /// so prestige value is monotonic. Returns the original state unchanged if
+    /// nothing is claimable.
+    public static func prestige(_ state: GameState) -> GameState {
+        let pending = pendingPrestige(in: state)
+        guard pending >= 1 else { return state }
+        var next = state
+        next.prestigePointsClaimed += pending
+        next.prestigeMultiplier = 1 + next.prestigePointsClaimed * prestigeMultiplierPerPoint
+        next.pegPoints = 0
+        next.upgradeLevels = [:]
+        return next
+    }
+
     /// The result of reconciling time the player spent away.
     public struct OfflineReport: Equatable {
         public let jumps: Int

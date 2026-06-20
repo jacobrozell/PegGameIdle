@@ -6,6 +6,12 @@ import PegGameDomain
 public protocol GameStateRepository {
     func load() -> GameState
     func save(_ state: GameState)
+    /// Wipes persisted progress back to a fresh game (used by `-reset_state`).
+    func reset()
+}
+
+public extension GameStateRepository {
+    func reset() { save(GameState()) }
 }
 
 /// Simple `UserDefaults`-backed store. The state is small (a few numbers and
@@ -32,6 +38,10 @@ public final class UserDefaultsGameStateRepository: GameStateRepository {
     public func save(_ state: GameState) {
         guard let data = try? JSONEncoder().encode(state) else { return }
         defaults.set(data, forKey: key)
+    }
+
+    public func reset() {
+        defaults.removeObject(forKey: key)
     }
 }
 

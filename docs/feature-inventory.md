@@ -11,7 +11,9 @@
 | Offline accrual + "welcome back" report (capped) | ✅ shipped | `specs/features/idle-economy.md` | `EconomyEngine.reconcileOffline` |
 | Upgrades: Peg Value, Auto-Jumper Speed, Offline Reserve | ✅ shipped | `specs/features/idle-economy.md` | `Upgrade.swift`, `UpgradesSection.swift` |
 | Local persistence (UserDefaults) | ✅ shipped | `specs/system/architecture.md` | `Data/GameStateRepository.swift` |
-| Prestige reset / multiplier | 🟡 partial | backlog | model field exists; no UI |
+| Compact number formatting (K/M/B) | ✅ shipped | `specs/features/idle-economy.md` | `Sources/PegGameDomain/NumberFormatting.swift` |
+| Prestige (bank points → permanent multiplier, resets progress) | ✅ shipped | `specs/features/idle-economy.md` | `EconomyEngine.prestige`, `PrestigeRow` |
+| Reset-state / disable-telemetry launch args | ✅ shipped | `specs/system/test-plan.md` | `App/AppDependencies.swift` |
 | Larger board tiers (size 6+) | 🟡 partial | backlog | `BoardLayout(size:)` supports; UI classic-only |
 | Settings / AppLinks / legal pages | ⛔ planned | — | — |
 | Localization (multi-locale) | ⛔ planned | — | en strings inline |

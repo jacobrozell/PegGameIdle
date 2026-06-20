@@ -34,10 +34,29 @@ public final class GameViewModel {
     }
 
     public var pegPoints: Double { state.pegPoints }
+    public var pegPointsText: String { NumberFormatting.compact(state.pegPoints) }
     public var pegsRemaining: Int { board.pegCount }
     public var autoJumpsPerSecond: Double { state.autoJumpsPerSecond }
     public var isBoardFinished: Bool { board.isGameOver }
     public var didWin: Bool { board.isSolved }
+
+    // MARK: Prestige
+
+    public var prestigeMultiplier: Double { state.prestigeMultiplier }
+    public var prestigeMultiplierText: String { String(format: "%.1f×", state.prestigeMultiplier) }
+    public var pendingPrestige: Int { Int(EconomyEngine.pendingPrestige(in: state)) }
+    public var canPrestige: Bool { EconomyEngine.canPrestige(state) }
+    public var projectedMultiplierText: String {
+        String(format: "%.1f×", EconomyEngine.projectedMultiplier(after: state))
+    }
+
+    /// Banks pending prestige points and resets spendable progress + the board.
+    public func prestige() {
+        guard canPrestige else { return }
+        state = EconomyEngine.prestige(state)
+        resetBoard()
+        persist()
+    }
 
     public func isSelected(_ position: Position) -> Bool { selection == position }
     public func isTarget(_ position: Position) -> Bool { targets.contains(position) }

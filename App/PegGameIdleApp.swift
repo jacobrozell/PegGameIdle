@@ -2,7 +2,7 @@ import SwiftUI
 
 @main
 struct PegGameIdleApp: App {
-    private let dependencies = AppDependencies()
+    private let dependencies = AppDependencies.live()
 
     var body: some Scene {
         WindowGroup {

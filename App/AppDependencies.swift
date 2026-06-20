@@ -6,8 +6,27 @@ import PegGameDomain
 @MainActor
 public final class AppDependencies {
     public let gameStateRepository: GameStateRepository
+    /// Whether analytics may emit. Off in v1 and forced off by `-disable_telemetry`.
+    public let telemetryEnabled: Bool
 
-    public init(gameStateRepository: GameStateRepository = UserDefaultsGameStateRepository()) {
+    public init(
+        gameStateRepository: GameStateRepository = UserDefaultsGameStateRepository(),
+        telemetryEnabled: Bool = false
+    ) {
         self.gameStateRepository = gameStateRepository
+        self.telemetryEnabled = telemetryEnabled
+    }
+
+    /// Builds dependencies for the running app, honoring test/dogfood launch
+    /// arguments (see `specs/system/test-plan.md`).
+    public static func live(arguments: [String] = ProcessInfo.processInfo.arguments) -> AppDependencies {
+        let repository = UserDefaultsGameStateRepository()
+        if arguments.contains("-reset_state") {
+            repository.reset()
+        }
+        // Telemetry is not implemented in v1, so it ships off; `-disable_telemetry`
+        // keeps it off for test/dogfood builds once it exists.
+        let telemetry = false && !arguments.contains("-disable_telemetry")
+        return AppDependencies(gameStateRepository: repository, telemetryEnabled: telemetry)
     }
 }

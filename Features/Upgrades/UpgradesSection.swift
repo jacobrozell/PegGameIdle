@@ -32,7 +32,7 @@ private struct UpgradeRow: View {
                     Text(kind.detail).font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Text("\(Int(viewModel.cost(of: kind))) PP")
+                Text("\(NumberFormatting.compact(viewModel.cost(of: kind))) PP")
                     .font(.callout.monospacedDigit())
                     .foregroundStyle(viewModel.canAfford(kind) ? Theme.Colors.accent : .secondary)
             }
