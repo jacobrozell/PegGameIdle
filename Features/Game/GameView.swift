@@ -14,15 +14,18 @@ public struct GameView: View {
 
     public var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                CurrencyHeader(viewModel: viewModel)
-                BoardView(viewModel: viewModel)
-                statusLine
-                controls
-                PrestigeRow(viewModel: viewModel)
-                UpgradesSection(viewModel: viewModel)
+            ScrollView {
+                VStack(spacing: 24) {
+                    CurrencyHeader(viewModel: viewModel)
+                    BoardView(viewModel: viewModel)
+                    statusLine
+                    controls
+                    DailyRow(viewModel: viewModel)
+                    PrestigeRow(viewModel: viewModel)
+                    UpgradesSection(viewModel: viewModel)
+                }
+                .padding()
             }
-            .padding()
             .navigationTitle("Peg Game Idle")
             .onReceive(tick) { _ in viewModel.tickAutoJumper(seconds: 1) }
         }
@@ -33,16 +36,30 @@ public struct GameView: View {
                 Text("Your Auto-Jumper cleared \(report.jumps) pegs and banked \(Int(report.pegPointsEarned)) Peg Points while you were away.")
             }
         }
+        .alert(boardResultTitle, isPresented: boardResultBinding) {
+            Button("Play On", action: viewModel.dismissBoardResult)
+        } message: {
+            if let r = viewModel.lastBoardResult {
+                Text(boardResultMessage(r))
+            }
+        }
+        .alert("Daily Puzzle complete", isPresented: dailyResultBinding) {
+            Button("Nice", action: viewModel.dismissDailyResult)
+        } message: {
+            if let r = viewModel.dailyResult {
+                Text(dailyResultMessage(r))
+            }
+        }
     }
 
     private var statusLine: some View {
         Group {
-            if viewModel.didWin {
-                Label("Solved! One peg left.", systemImage: "trophy.fill")
-                    .foregroundStyle(.green)
-            } else if viewModel.isBoardFinished {
-                Label("No moves left — \(viewModel.pegsRemaining) pegs remain.", systemImage: "flag.checkered")
-                    .foregroundStyle(.secondary)
+            if viewModel.isDailyMode {
+                Label("Daily Puzzle — solve it!", systemImage: "calendar")
+                    .foregroundStyle(Theme.Colors.accent)
+            } else if viewModel.streakCount > 1 {
+                Label("\(viewModel.streakCount)× streak — \(viewModel.pegsRemaining) pegs left", systemImage: "flame.fill")
+                    .foregroundStyle(.orange)
             } else {
                 Text("\(viewModel.pegsRemaining) pegs remaining")
                     .foregroundStyle(.secondary)
@@ -54,7 +71,7 @@ public struct GameView: View {
 
     private var controls: some View {
         Button {
-            viewModel.resetBoard()
+            viewModel.dealNormalBoard()
         } label: {
             Label("New Board", systemImage: "arrow.clockwise")
                 .frame(maxWidth: .infinity, minHeight: Theme.Metrics.minTouchTarget)
@@ -64,11 +81,75 @@ public struct GameView: View {
         .accessibilityIdentifier("new-board-button")
     }
 
+    // MARK: Alert plumbing
+
+    private var boardResultTitle: String {
+        viewModel.lastBoardResult.map(\.rank.displayName) ?? ""
+    }
+
+    private func boardResultMessage(_ r: EconomyEngine.BoardResult) -> String {
+        let pegs = "\(r.pegsLeft) peg\(r.pegsLeft == 1 ? "" : "s") left"
+        guard r.bonusAwarded > 0 else { return "\(pegs). No completion bonus — try to leave fewer!" }
+        let streak = r.streakCount > 1 ? " (\(r.streakCount)× streak)" : ""
+        return "\(pegs) — completion bonus +\(NumberFormatting.compact(r.bonusAwarded)) Peg Points\(streak)."
+    }
+
+    private func dailyResultMessage(_ r: EconomyEngine.DailyResult) -> String {
+        "\(r.rank.displayName)! Day \(r.dailyStreak) streak — +\(NumberFormatting.compact(r.prestigeJumpsAwarded)) prestige progress."
+    }
+
     private var offlineBinding: Binding<Bool> {
         Binding(
             get: { viewModel.offlineReport != nil },
             set: { if !$0 { viewModel.dismissOfflineReport() } }
         )
+    }
+
+    private var boardResultBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.lastBoardResult != nil },
+            set: { if !$0 { viewModel.dismissBoardResult() } }
+        )
+    }
+
+    private var dailyResultBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.dailyResult != nil },
+            set: { if !$0 { viewModel.dismissDailyResult() } }
+        )
+    }
+}
+
+/// Daily Puzzle entry: a date-seeded board whose result accelerates prestige.
+private struct DailyRow: View {
+    let viewModel: GameViewModel
+
+    var body: some View {
+        Button {
+            viewModel.startDailyPuzzle()
+        } label: {
+            HStack {
+                Image(systemName: "calendar.badge.clock")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Daily Puzzle").font(.subheadline.weight(.semibold))
+                    Text(subtitle).font(.caption).foregroundStyle(.secondary)
+                }
+                Spacer()
+            }
+            .frame(minHeight: Theme.Metrics.minTouchTarget)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.bordered)
+        .disabled(viewModel.isDailyMode)
+        .accessibilityIdentifier("daily-puzzle-button")
+        .accessibilityHint("Plays today's seeded board for prestige progress")
+    }
+
+    private var subtitle: String {
+        if viewModel.dailyClaimedToday {
+            return "Claimed today · \(viewModel.dailyStreak)-day streak"
+        }
+        return viewModel.dailyStreak > 0 ? "\(viewModel.dailyStreak)-day streak — play today's board" : "Play today's board"
     }
 }
 

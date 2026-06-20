@@ -19,15 +19,26 @@ remove them, aim to leave a single peg.
   remains (`isSolved`).
 
 ## Interaction (UI)
-1. Tap a peg to **select** it; legal landing holes highlight (green + down-arrow
-   glyph, non-color cue).
-2. Tap a highlighted hole to **jump**. Tap the selected peg again to deselect.
-   Tapping another peg re-selects.
-3. **New Board** resets the board, keeping idle progress.
+Two input paths, same underlying domain logic:
+
+1. **Drag-to-jump (primary, tactile):** press a peg and drag toward the empty
+   hole you want to land in. Legal landing holes highlight on pick-up; on
+   release the drag vector is matched to the best legal jump (by direction) and
+   performed. A drag that matches no legal jump springs back — no penalty.
+2. **Tap-select (fallback, accessible):** tap a peg to **select** it (legal
+   landing holes highlight: green + down-arrow glyph, a non-color cue); tap a
+   highlighted hole to **jump**; tap the selected peg again to deselect. This
+   path is fully operable by VoiceOver and Switch Control, which cannot perform
+   drags — required by the accessibility gate.
+
+**Board end is automatic:** when no legal move remains the run ends, pays its
+completion bonus, and a fresh board is dealt (see `scoring.md`). A manual **New
+Board** control is still available.
 
 ## Economy hook
 Each jump (manual or auto) awards `pegValue × prestigeMultiplier` Peg Points and
-increments `totalPegsJumped`. See `idle-economy.md`.
+increments `totalPegsJumped`. End-of-board completion bonuses and streaks are
+specced in `scoring.md`. See also `idle-economy.md`.
 
 ## Accessibility
 - Each hole is a button with id `hole-{row}-{col}`, label reflecting state

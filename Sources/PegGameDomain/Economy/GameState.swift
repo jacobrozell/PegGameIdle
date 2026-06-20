@@ -15,6 +15,14 @@ public struct GameState: Equatable, Sendable, Codable {
     public var upgradeLevels: [UpgradeKind: Int]
     /// Lifetime prestige points already claimed. Drives `prestigeMultiplier`.
     public var prestigePointsClaimed: Double
+    /// Current run of streak-worthy board finishes. Resets on a weak finish.
+    public var streakCount: Int
+    /// Bonus prestige progress earned from Daily Puzzles (jump-equivalent).
+    public var dailyPrestigeJumps: Double
+    /// Consecutive days the Daily Puzzle was completed.
+    public var dailyStreak: Int
+    /// UTC day number of the last Daily Puzzle claim, if any.
+    public var lastDailyDay: Int?
     /// When earnings were last reconciled. Drives offline accrual.
     public var lastSeen: Date
 
@@ -24,6 +32,10 @@ public struct GameState: Equatable, Sendable, Codable {
         totalPegsJumped: Int = 0,
         upgradeLevels: [UpgradeKind: Int] = [:],
         prestigePointsClaimed: Double = 0,
+        streakCount: Int = 0,
+        dailyPrestigeJumps: Double = 0,
+        dailyStreak: Int = 0,
+        lastDailyDay: Int? = nil,
         lastSeen: Date = .init()
     ) {
         self.pegPoints = pegPoints
@@ -31,6 +43,10 @@ public struct GameState: Equatable, Sendable, Codable {
         self.totalPegsJumped = totalPegsJumped
         self.upgradeLevels = upgradeLevels
         self.prestigePointsClaimed = prestigePointsClaimed
+        self.streakCount = streakCount
+        self.dailyPrestigeJumps = dailyPrestigeJumps
+        self.dailyStreak = dailyStreak
+        self.lastDailyDay = lastDailyDay
         self.lastSeen = lastSeen
     }
 
@@ -42,6 +58,10 @@ public struct GameState: Equatable, Sendable, Codable {
         totalPegsJumped = try c.decodeIfPresent(Int.self, forKey: .totalPegsJumped) ?? 0
         upgradeLevels = try c.decodeIfPresent([UpgradeKind: Int].self, forKey: .upgradeLevels) ?? [:]
         prestigePointsClaimed = try c.decodeIfPresent(Double.self, forKey: .prestigePointsClaimed) ?? 0
+        streakCount = try c.decodeIfPresent(Int.self, forKey: .streakCount) ?? 0
+        dailyPrestigeJumps = try c.decodeIfPresent(Double.self, forKey: .dailyPrestigeJumps) ?? 0
+        dailyStreak = try c.decodeIfPresent(Int.self, forKey: .dailyStreak) ?? 0
+        lastDailyDay = try c.decodeIfPresent(Int.self, forKey: .lastDailyDay)
         lastSeen = try c.decodeIfPresent(Date.self, forKey: .lastSeen) ?? Date()
     }
 

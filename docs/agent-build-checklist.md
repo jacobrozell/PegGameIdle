@@ -52,6 +52,7 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 | 5 App shell | 2026-06-20 | _initial_ | `@main`, AppDependencies, NavigationStack. Router/onboarding/flags open. |
 | 6 First vertical slice | 2026-06-20 | _initial_ | entry → play board → earn → persist → offline reconcile. Integration test open. |
 | 6b Prestige + polish | 2026-06-20 | _follow-up_ | Prestige loop (bank points → permanent multiplier), compact K/M/B formatting, `-reset_state`/`-disable_telemetry` launch args honored. +12 domain tests. |
+| 6c Gameflow mechanics | 2026-06-20 | _follow-up_ | Specs: scoring + daily-puzzle. Completion scoring (rank multiplier + streak + auto-deal), Auto-Jumper on its own board, drag-to-jump + tap fallback, date-seeded Daily Puzzle feeding prestige. +18 domain tests. UI unverified (no toolchain). |
 | 7–18 | | | Not started — see below. |
 
 ---

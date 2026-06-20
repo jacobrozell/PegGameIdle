@@ -14,12 +14,15 @@ PP to earn faster. This is what makes the puzzle an idle game.
 
 ## Auto-Jumper
 - Rate (jumps/sec) = `0.5 × level(autoJumperSpeed)`; 0 at level 0.
+- Runs on its **own** board (separate from the human's run, so it never consumes
+  a board you're mid-solve). Earns per-jump points only at ×1 — **no** completion
+  bonus or streak. This is the income *floor*; skilled manual play is the ceiling
+  (see `scoring.md`).
 - **Foreground:** a 1 Hz timer plays whole jumps via a deterministic greedy
-  `AutoPlayer` on the live board; when the board ends the player starts a new one
-  implicitly (next tick acts on whatever board is present — currently the human's
-  board). Earnings credit immediately.
+  `AutoPlayer` on the Auto-Jumper board; when that board ends it auto-deals a new
+  one. Earnings credit immediately.
 - **Offline:** on launch, `EconomyEngine.reconcileOffline(now:state:)` credits
-  `rate × min(elapsed, cap)` jumps. Time is injected for testability.
+  `rate × min(elapsed, cap)` jumps at ×1. Time is injected for testability.
 
 ## Upgrades (repeatable, geometric cost)
 
@@ -38,7 +41,9 @@ jumps cleared + PP banked. `wasCapped` is tracked (UI may surface "reserve full"
 later). Dismiss credits nothing extra (already credited).
 
 ## Prestige
-- **Pending points** = `floor(sqrt(totalPegsJumped / 500)) − prestigePointsClaimed`.
+- **Pending points** = `floor(sqrt((totalPegsJumped + dailyPrestigeJumps) / 500))
+  − prestigePointsClaimed`. The Daily Puzzle feeds `dailyPrestigeJumps` (see
+  `daily-puzzle.md`).
 - Each banked point adds `0.1` to the permanent `prestigeMultiplier`
   (1 point → 1.1×, 2 → 1.2×, …), applied to every future reward.
 - **Prestige** is offered (button + confirmation dialog) once ≥ 1 point is

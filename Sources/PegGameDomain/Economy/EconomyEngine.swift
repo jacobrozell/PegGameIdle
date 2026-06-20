@@ -45,8 +45,11 @@ public enum EconomyEngine {
     public static let prestigeMultiplierPerPoint: Double = 0.1
 
     /// Prestige points currently available to claim (beyond those already banked).
+    /// Daily Puzzle progress (`dailyPrestigeJumps`) counts toward this alongside
+    /// real lifetime jumps.
     public static func pendingPrestige(in state: GameState) -> Double {
-        let earnable = (Double(state.totalPegsJumped) / jumpsPerPrestigePoint).squareRoot().rounded(.down)
+        let progress = Double(state.totalPegsJumped) + state.dailyPrestigeJumps
+        let earnable = (progress / jumpsPerPrestigePoint).squareRoot().rounded(.down)
         return max(0, earnable - state.prestigePointsClaimed)
     }
 
@@ -73,6 +76,90 @@ public enum EconomyEngine {
         next.pegPoints = 0
         next.upgradeLevels = [:]
         return next
+    }
+
+    // MARK: Board completion
+
+    /// Per-streak-worthy-board bump to the completion bonus.
+    public static let streakMultiplierStep: Double = 0.1
+
+    /// The outcome of a finished manual board, for the end-of-board tally.
+    public struct BoardResult: Equatable {
+        public let pegsLeft: Int
+        public let rank: BoardRank
+        public let completionMultiplier: Double
+        public let streakCount: Int
+        public let streakMultiplier: Double
+        public let bonusAwarded: Double
+    }
+
+    /// Settles a finished *manual* board: updates the streak and awards a
+    /// completion bonus on top of the per-jump points already earned this run.
+    ///
+    /// - Parameters:
+    ///   - pegsLeft: pegs remaining when the board ran out of moves.
+    ///   - boardEarnings: Peg Points earned from jumps during this run (the base
+    ///     the completion multiplier scales).
+    public static func completeBoard(pegsLeft: Int, boardEarnings: Double, state: GameState) -> (state: GameState, result: BoardResult) {
+        let rank = BoardRank(pegsLeft: pegsLeft)
+        let completionMult = rank.completionMultiplier(pegsLeft: pegsLeft)
+
+        var next = state
+        next.streakCount = rank.isStreakWorthy ? state.streakCount + 1 : 0
+        let streakMult = 1 + streakMultiplierStep * Double(next.streakCount)
+        let bonus = max(0, boardEarnings * (completionMult - 1) * streakMult)
+        next.pegPoints += bonus
+
+        return (
+            next,
+            BoardResult(
+                pegsLeft: pegsLeft,
+                rank: rank,
+                completionMultiplier: completionMult,
+                streakCount: next.streakCount,
+                streakMultiplier: streakMult,
+                bonusAwarded: bonus
+            )
+        )
+    }
+
+    // MARK: Daily Puzzle
+
+    /// Base prestige-jump reward for a daily solve, before rank/streak scaling.
+    public static let dailyBasePrestigeJumps: Double = 100
+
+    public struct DailyResult: Equatable {
+        public let dayNumber: Int
+        public let rank: BoardRank
+        public let dailyStreak: Int
+        public let prestigeJumpsAwarded: Double
+        public let alreadyClaimed: Bool
+    }
+
+    /// Claims today's Daily Puzzle reward (idempotent per day). Grants bonus
+    /// prestige progress scaled by rank and the daily streak. Retrying a day
+    /// already claimed returns the state unchanged with `alreadyClaimed = true`.
+    public static func completeDaily(pegsLeft: Int, on date: Date, state: GameState) -> (state: GameState, result: DailyResult) {
+        let today = DailyPuzzle.dayNumber(for: date)
+        let rank = BoardRank(pegsLeft: pegsLeft)
+
+        if state.lastDailyDay == today {
+            return (state, DailyResult(dayNumber: today, rank: rank, dailyStreak: state.dailyStreak, prestigeJumpsAwarded: 0, alreadyClaimed: true))
+        }
+
+        var next = state
+        next.dailyStreak = (state.lastDailyDay == today - 1) ? state.dailyStreak + 1 : 1
+        next.lastDailyDay = today
+
+        let base = dailyBasePrestigeJumps * rank.completionMultiplier(pegsLeft: pegsLeft)
+        let streakBonus = 1 + 0.1 * Double(next.dailyStreak - 1)
+        let award = base * streakBonus
+        next.dailyPrestigeJumps += award
+
+        return (
+            next,
+            DailyResult(dayNumber: today, rank: rank, dailyStreak: next.dailyStreak, prestigeJumpsAwarded: award, alreadyClaimed: false)
+        )
     }
 
     /// The result of reconciling time the player spent away.

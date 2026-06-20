@@ -45,9 +45,23 @@ struct BoardView: View {
                 .frame(width: Theme.Metrics.pegDiameter, height: Theme.Metrics.pegDiameter)
         }
         .buttonStyle(.plain)
+        // Drag-to-jump, layered so quick taps still hit the button and
+        // VoiceOver/Switch Control keep the button's accessibility action. The
+        // handlers no-op when `position` holds no peg.
+        .simultaneousGesture(dragGesture(from: position))
         .accessibilityIdentifier("hole-\(position.row)-\(position.col)")
         .accessibilityLabel(accessibilityLabel(hasPeg: hasPeg, isSelected: isSelected, isTarget: isTarget))
         .accessibilityHint(hasPeg ? "Double-tap to select this peg" : isTarget ? "Double-tap to jump here" : "")
+    }
+
+    private func dragGesture(from position: Position) -> some Gesture {
+        DragGesture(minimumDistance: 10)
+            .onChanged { _ in
+                if !viewModel.isSelected(position) { viewModel.beginDrag(from: position) }
+            }
+            .onEnded { value in
+                viewModel.endDrag(from: position, translation: value.translation)
+            }
     }
 
     private func fillColor(hasPeg: Bool, isSelected: Bool, isTarget: Bool) -> Color {
