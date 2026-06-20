@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import PegGameDomain
 
 /// The core journey screen: play the board, watch idle earnings, buy upgrades.
@@ -14,17 +15,16 @@ public struct GameView: View {
 
     public var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    CurrencyHeader(viewModel: viewModel)
-                    BoardView(viewModel: viewModel)
-                    statusLine
-                    controls
-                    DailyRow(viewModel: viewModel)
-                    PrestigeRow(viewModel: viewModel)
-                    UpgradesSection(viewModel: viewModel)
+            GeometryReader { proxy in
+                let idiom: AdaptiveLayout.Idiom =
+                    UIDevice.current.userInterfaceIdiom == .pad ? .pad : .phone
+                let isLandscape = proxy.size.width > proxy.size.height
+
+                if AdaptiveLayout.usesSideBySide(idiom: idiom, isLandscape: isLandscape) {
+                    sideBySideLayout
+                } else {
+                    stackedLayout
                 }
-                .padding()
             }
             .navigationTitle("Peg Game Idle")
             .onReceive(tick) { _ in viewModel.tickAutoJumper(seconds: 1) }
@@ -33,7 +33,7 @@ public struct GameView: View {
             Button("Collect", action: viewModel.dismissOfflineReport)
         } message: {
             if let report = viewModel.offlineReport {
-                Text("Your Auto-Jumper cleared \(report.jumps) pegs and banked \(Int(report.pegPointsEarned)) Peg Points while you were away.")
+                Text(offlineMessage(report))
             }
         }
         .alert(boardResultTitle, isPresented: boardResultBinding) {
@@ -50,6 +50,50 @@ public struct GameView: View {
                 Text(dailyResultMessage(r))
             }
         }
+    }
+
+    // MARK: Layouts
+
+    /// Single column (iPhone any orientation, iPad portrait): everything scrolls.
+    private var stackedLayout: some View {
+        ScrollView {
+            VStack(spacing: 24) {
+                CurrencyHeader(viewModel: viewModel)
+                BoardView(viewModel: viewModel)
+                statusLine
+                controls
+                DailyRow(viewModel: viewModel)
+                PrestigeRow(viewModel: viewModel)
+                UpgradesSection(viewModel: viewModel)
+            }
+            .padding()
+            .frame(maxWidth: 600)
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    /// Two columns (iPad landscape): board fixed on the left, the economy panel
+    /// scrolls on the right so the board never gets pushed off-screen.
+    private var sideBySideLayout: some View {
+        HStack(alignment: .top, spacing: 32) {
+            VStack(spacing: 20) {
+                CurrencyHeader(viewModel: viewModel)
+                BoardView(viewModel: viewModel)
+                statusLine
+                controls
+            }
+            .frame(maxWidth: .infinity)
+
+            ScrollView {
+                VStack(spacing: 20) {
+                    DailyRow(viewModel: viewModel)
+                    PrestigeRow(viewModel: viewModel)
+                    UpgradesSection(viewModel: viewModel)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(24)
     }
 
     private var statusLine: some View {
@@ -96,6 +140,12 @@ public struct GameView: View {
 
     private func dailyResultMessage(_ r: EconomyEngine.DailyResult) -> String {
         "\(r.rank.displayName)! Day \(r.dailyStreak) streak — +\(NumberFormatting.compact(r.prestigeJumpsAwarded)) prestige progress."
+    }
+
+    private func offlineMessage(_ report: EconomyEngine.OfflineReport) -> String {
+        let base = "Your Auto-Jumper cleared \(report.jumps) pegs and banked \(NumberFormatting.compact(report.pegPointsEarned)) Peg Points while you were away."
+        guard report.wasCapped else { return base }
+        return base + "\n\nYour Offline Reserve filled up — upgrade it to bank more while away."
     }
 
     private var offlineBinding: Binding<Bool> {

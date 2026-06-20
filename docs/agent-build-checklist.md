@@ -53,7 +53,8 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 | 6 First vertical slice | 2026-06-20 | _initial_ | entry → play board → earn → persist → offline reconcile. Integration test open. |
 | 6b Prestige + polish | 2026-06-20 | _follow-up_ | Prestige loop (bank points → permanent multiplier), compact K/M/B formatting, `-reset_state`/`-disable_telemetry` launch args honored. +12 domain tests. |
 | 6c Gameflow mechanics | 2026-06-20 | _follow-up_ | Specs: scoring + daily-puzzle. Completion scoring (rank multiplier + streak + auto-deal), Auto-Jumper on its own board, drag-to-jump + tap fallback, date-seeded Daily Puzzle feeding prestige. +18 domain tests. UI unverified (no toolchain). |
-| 7–18 | | | Not started — see below. |
+| 7 (partial) Adaptive layout | 2026-06-20 | _follow-up_ | iPad-landscape two-column vs stacked via `AdaptiveLayout` (idiom-based, +3 unit tests); offline "reserve full" cue. iPad side-by-side + Dynamic Type still need device QA. |
+| 8–18 | | | Not started — see below. |
 
 ---
 
@@ -115,9 +116,16 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 - [x] 6.7 UI test identifiers on critical controls
 - [ ] 6.6 Integration test: slice + relaunch + restore (UI smoke present; full restore test open)
 
-### Phases 7–18 — Not started
-Adaptive layout, settings/AppLinks, history, localization wrapper, a11y
-hardening, full CI matrix, release-surface gating, legal pages, release QA.
+### Phase 7 — Shared chrome & adaptive layout (partial)
+- [x] 7.4 Orientation: iPad-landscape two-column vs stacked elsewhere
+- [x] 7.5 iPad predicate documented + unit-tested (`AdaptiveLayout`)
+- [ ] 7.1 Shared headers/toolbars/empty-state components extracted
+- [ ] 7.2 Non-color state indicators audit across all surfaces
+- [ ] iPad side-by-side + Dynamic Type need device QA (no simulator here)
+
+### Phases 8–18 — Not started
+Settings/AppLinks, history, localization wrapper, a11y hardening, full CI
+matrix, release-surface gating, legal pages, release QA.
 
 ---
 

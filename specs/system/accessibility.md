@@ -20,7 +20,7 @@ Target: **WCAG 2.1 AA**. No launch with open critical failures on core flows.
 
 | Screen | VoiceOver | Dynamic Type (AXXXL) | Contrast (light/dark) | Orientation | Status |
 |--------|-----------|----------------------|-----------------------|-------------|--------|
-| Game (board + header + upgrades) | labels/hints/ids in code; **manual pass pending** | not audited | not measured | portrait (iPhone) | 🟡 engineering pass only |
+| Game (board + header + upgrades) | labels/hints/ids in code; **manual pass pending** | not audited | not measured | iPhone portrait; iPad portrait stacked; iPad landscape two-column (`AdaptiveLayout`, unit-tested) | 🟡 engineering pass only |
 
 Legend: 🟡 code-level a11y present, manual verification outstanding.
 
