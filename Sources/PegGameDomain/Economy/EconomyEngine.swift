@@ -7,14 +7,23 @@ public enum EconomyEngine {
 
     public enum PurchaseError: Error, Equatable {
         case insufficientFunds(needed: Double, have: Double)
+        case maxLevelReached
+    }
+
+    private static func recordEarnings(_ amount: Double, in state: inout GameState) {
+        guard amount > 0 else { return }
+        state.lifetimePegPointsEarned += amount
     }
 
     /// Awards Peg Points for a batch of pegs jumped (manual play).
-    public static func awardJumps(_ count: Int, to state: GameState) -> GameState {
+    public static func awardJumps(_ count: Int, to state: GameState, manual: Bool = false) -> GameState {
         guard count > 0 else { return state }
         var next = state
-        next.pegPoints += state.reward(forJumping: count)
+        let earned = state.reward(forJumping: count)
+        next.pegPoints += earned
+        recordEarnings(earned, in: &next)
         next.totalPegsJumped += count
+        if manual { next.manualJumps += count }
         return next
     }
 
@@ -23,8 +32,37 @@ public enum EconomyEngine {
         kind.cost(atLevel: state.level(of: kind))
     }
 
-    /// Buys one level of `kind`. Throws if funds are insufficient.
+    /// Total cost to buy `levels` of `kind`, or fewer if max level is reached.
+    public static func bulkUpgradeCost(_ kind: UpgradeKind, levels: Int, in state: GameState) -> Double {
+        guard levels > 0 else { return 0 }
+        var total = 0.0
+        var level = state.level(of: kind)
+        for _ in 0..<levels {
+            guard level < UpgradeKind.maxLevel else { break }
+            total += kind.cost(atLevel: level)
+            level += 1
+        }
+        return total
+    }
+
+    /// Maximum affordable levels of `kind` with current Peg Points.
+    public static func maxAffordableLevels(_ kind: UpgradeKind, in state: GameState) -> Int {
+        var remaining = state.pegPoints
+        var level = state.level(of: kind)
+        var count = 0
+        while level < UpgradeKind.maxLevel {
+            let price = kind.cost(atLevel: level)
+            guard remaining >= price else { break }
+            remaining -= price
+            level += 1
+            count += 1
+        }
+        return count
+    }
+
+    /// Buys one level of `kind`. Throws if funds are insufficient or at max level.
     public static func purchase(_ kind: UpgradeKind, in state: GameState) throws -> GameState {
+        guard state.level(of: kind) < UpgradeKind.maxLevel else { throw PurchaseError.maxLevelReached }
         let price = cost(of: kind, in: state)
         guard state.pegPoints >= price else {
             throw PurchaseError.insufficientFunds(needed: price, have: state.pegPoints)
@@ -32,6 +70,17 @@ public enum EconomyEngine {
         var next = state
         next.pegPoints -= price
         next.upgradeLevels[kind, default: 0] += 1
+        return next
+    }
+
+    /// Buys up to `levels` of `kind`. Returns unchanged state if nothing affordable.
+    public static func purchaseBulk(_ kind: UpgradeKind, levels: Int, in state: GameState) -> GameState {
+        guard levels > 0 else { return state }
+        var next = state
+        for _ in 0..<levels {
+            guard let purchased = try? purchase(kind, in: next) else { break }
+            next = purchased
+        }
         return next
     }
 
@@ -51,6 +100,16 @@ public enum EconomyEngine {
         let progress = Double(state.totalPegsJumped) + state.dailyPrestigeJumps
         let earnable = (progress / jumpsPerPrestigePoint).squareRoot().rounded(.down)
         return max(0, earnable - state.prestigePointsClaimed)
+    }
+
+    /// Fraction toward the next prestige point (0…1).
+    public static func prestigeProgressFraction(in state: GameState) -> Double {
+        let progress = Double(state.totalPegsJumped) + state.dailyPrestigeJumps
+        let earned = (progress / jumpsPerPrestigePoint).squareRoot().rounded(.down)
+        let currentThreshold = earned * earned * jumpsPerPrestigePoint
+        let nextThreshold = (earned + 1) * (earned + 1) * jumpsPerPrestigePoint
+        guard nextThreshold > currentThreshold else { return 1 }
+        return min(1, max(0, (progress - currentThreshold) / (nextThreshold - currentThreshold)))
     }
 
     public static func canPrestige(_ state: GameState) -> Bool {
@@ -75,6 +134,7 @@ public enum EconomyEngine {
         next.prestigeMultiplier = 1 + next.prestigePointsClaimed * prestigeMultiplierPerPoint
         next.pegPoints = 0
         next.upgradeLevels = [:]
+        next.totalPrestiges += 1
         return next
     }
 
@@ -84,13 +144,28 @@ public enum EconomyEngine {
     public static let streakMultiplierStep: Double = 0.1
 
     /// The outcome of a finished manual board, for the end-of-board tally.
-    public struct BoardResult: Equatable {
+    public struct BoardResult: Equatable, Sendable {
         public let pegsLeft: Int
         public let rank: BoardRank
         public let completionMultiplier: Double
         public let streakCount: Int
         public let streakMultiplier: Double
         public let bonusAwarded: Double
+        public let boardEarnings: Double
+    }
+
+    private static func updateBestRank(_ rank: BoardRank, pegsLeft: Int, in state: inout GameState) {
+        let currentBest = state.bestRank.map { bestPegs(for: $0) } ?? Int.max
+        if pegsLeft < currentBest { state.bestRank = rank }
+    }
+
+    private static func bestPegs(for rank: BoardRank) -> Int {
+        switch rank {
+        case .genius: return 1
+        case .purtySmart: return 2
+        case .justPlainDumb: return 3
+        case .egNoRaMoose: return 4
+        }
     }
 
     /// Settles a finished *manual* board: updates the streak and awards a
@@ -106,9 +181,12 @@ public enum EconomyEngine {
 
         var next = state
         next.streakCount = rank.isStreakWorthy ? state.streakCount + 1 : 0
+        next.totalBoardsCompleted += 1
+        updateBestRank(rank, pegsLeft: pegsLeft, in: &next)
         let streakMult = 1 + streakMultiplierStep * Double(next.streakCount)
         let bonus = max(0, boardEarnings * (completionMult - 1) * streakMult)
         next.pegPoints += bonus
+        recordEarnings(bonus, in: &next)
 
         return (
             next,
@@ -118,7 +196,8 @@ public enum EconomyEngine {
                 completionMultiplier: completionMult,
                 streakCount: next.streakCount,
                 streakMultiplier: streakMult,
-                bonusAwarded: bonus
+                bonusAwarded: bonus,
+                boardEarnings: boardEarnings
             )
         )
     }
@@ -128,7 +207,7 @@ public enum EconomyEngine {
     /// Base prestige-jump reward for a daily solve, before rank/streak scaling.
     public static let dailyBasePrestigeJumps: Double = 100
 
-    public struct DailyResult: Equatable {
+    public struct DailyResult: Equatable, Sendable {
         public let dayNumber: Int
         public let rank: BoardRank
         public let dailyStreak: Int
@@ -150,6 +229,10 @@ public enum EconomyEngine {
         var next = state
         next.dailyStreak = (state.lastDailyDay == today - 1) ? state.dailyStreak + 1 : 1
         next.lastDailyDay = today
+        next.lastDailyRank = rank
+        next.lastDailyPegsLeft = pegsLeft
+        next.totalBoardsCompleted += 1
+        updateBestRank(rank, pegsLeft: pegsLeft, in: &next)
 
         let base = dailyBasePrestigeJumps * rank.completionMultiplier(pegsLeft: pegsLeft)
         let streakBonus = 1 + 0.1 * Double(next.dailyStreak - 1)
@@ -163,11 +246,32 @@ public enum EconomyEngine {
     }
 
     /// The result of reconciling time the player spent away.
-    public struct OfflineReport: Equatable {
+    public struct OfflineReport: Equatable, Sendable {
         public let jumps: Int
         public let pegPointsEarned: Double
         public let effectiveSeconds: Double
         public let wasCapped: Bool
+        public let elapsedSeconds: Double
+        public let capHours: Double
+        public let jumpsPerSecond: Double
+
+        public init(
+            jumps: Int,
+            pegPointsEarned: Double,
+            effectiveSeconds: Double,
+            wasCapped: Bool,
+            elapsedSeconds: Double,
+            capHours: Double,
+            jumpsPerSecond: Double
+        ) {
+            self.jumps = jumps
+            self.pegPointsEarned = pegPointsEarned
+            self.effectiveSeconds = effectiveSeconds
+            self.wasCapped = wasCapped
+            self.elapsedSeconds = elapsedSeconds
+            self.capHours = capHours
+            self.jumpsPerSecond = jumpsPerSecond
+        }
     }
 
     /// Reconciles idle Auto-Jumper earnings for the elapsed time and returns the
@@ -186,12 +290,24 @@ public enum EconomyEngine {
         next.lastSeen = now
 
         guard rate > 0, effective > 0 else {
-            return (next, OfflineReport(jumps: 0, pegPointsEarned: 0, effectiveSeconds: effective, wasCapped: elapsed > cap))
+            return (
+                next,
+                OfflineReport(
+                    jumps: 0,
+                    pegPointsEarned: 0,
+                    effectiveSeconds: effective,
+                    wasCapped: elapsed > cap,
+                    elapsedSeconds: elapsed,
+                    capHours: state.offlineCapHours,
+                    jumpsPerSecond: rate
+                )
+            )
         }
 
         let jumps = Int((rate * effective).rounded(.down))
         let earned = state.reward(forJumping: jumps)
         next.pegPoints += earned
+        recordEarnings(earned, in: &next)
         next.totalPegsJumped += jumps
 
         return (
@@ -200,7 +316,10 @@ public enum EconomyEngine {
                 jumps: jumps,
                 pegPointsEarned: earned,
                 effectiveSeconds: effective,
-                wasCapped: elapsed > cap
+                wasCapped: elapsed > cap,
+                elapsedSeconds: elapsed,
+                capHours: state.offlineCapHours,
+                jumpsPerSecond: rate
             )
         )
     }

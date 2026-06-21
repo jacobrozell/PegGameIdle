@@ -10,7 +10,11 @@ import PegGameDomain
 final class GameViewModelTests: XCTestCase {
 
     private func makeViewModel(state: GameState = GameState()) -> GameViewModel {
-        GameViewModel(repository: InMemoryGameStateRepository(state: state), now: Date())
+        GameViewModel(
+            repository: InMemoryGameStateRepository(state: state),
+            settingsStore: InMemorySettingsStore(),
+            now: Date()
+        )
     }
 
     // Apex empty: the peg at (2,0) has exactly one legal jump, up-right to (0,0).
@@ -136,6 +140,19 @@ final class GameViewModelTests: XCTestCase {
         vm.startDailyPuzzle(now: Date(timeIntervalSince1970: 1_000_000))
         XCTAssertTrue(vm.isDailyMode)
         XCTAssertEqual(vm.pegsRemaining, 14)
+        XCTAssertEqual(vm.selectedTab, .play)
+    }
+
+    func testToastQueueDrainsOnDismiss() {
+        let vm = makeViewModel(state: GameState(totalBoardsCompleted: 1, bestRank: .genius))
+        vm.evaluateAchievements(for: .boardCompleted(pegsLeft: 1))
+        XCTAssertNotNil(vm.toast)
+        let firstMessage = vm.toast?.message
+        vm.dismissCurrentToast()
+        XCTAssertNotNil(vm.toast)
+        XCTAssertNotEqual(vm.toast?.message, firstMessage)
+        vm.dismissCurrentToast()
+        XCTAssertNil(vm.toast)
     }
 
     func testResetAllProgressWipesState() {

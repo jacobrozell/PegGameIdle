@@ -6,6 +6,9 @@ import Foundation
 /// cost grows geometrically with level so progression stays exponential, the
 /// hallmark of the idle genre.
 public enum UpgradeKind: String, CaseIterable, Sendable, Codable {
+    /// Maximum repeatable level per upgrade (v2 shop cap).
+    public static let maxLevel = 25
+
     /// Increases Peg Points earned per peg jumped.
     case pegValue
     /// Increases how fast the Auto-Jumper plays (jumps per second).
@@ -26,6 +29,27 @@ public enum UpgradeKind: String, CaseIterable, Sendable, Codable {
         case .pegValue: return "More Peg Points for every peg you jump."
         case .autoJumperSpeed: return "The Auto-Jumper clears pegs faster."
         case .offlineReserve: return "Bank more idle earnings while you're away."
+        }
+    }
+
+    public var icon: String {
+        switch self {
+        case .pegValue: return "dollarsign.circle.fill"
+        case .autoJumperSpeed: return "bolt.fill"
+        case .offlineReserve: return "moon.zzz.fill"
+        }
+    }
+
+    /// Human-readable effect at `level` for shop UI.
+    public func effectDescription(at level: Int) -> String {
+        switch self {
+        case .pegValue:
+            return "+\(NumberFormatting.compact(UpgradeEffect.pegValue(level: level))) per jump"
+        case .autoJumperSpeed:
+            let rate = UpgradeEffect.autoJumpsPerSecond(level: level)
+            return rate > 0 ? String(format: "%.1f jumps/s", rate) : "Idle auto-play"
+        case .offlineReserve:
+            return "\(Int(UpgradeEffect.offlineCapHours(level: level)))h offline cap"
         }
     }
 

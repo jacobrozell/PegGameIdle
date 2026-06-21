@@ -40,6 +40,8 @@ final class DailyPuzzleTests: XCTestCase {
         XCTAssertEqual(result.prestigeJumpsAwarded, 500, accuracy: 0.0001)
         XCTAssertEqual(next.dailyPrestigeJumps, 500, accuracy: 0.0001)
         XCTAssertEqual(next.lastDailyDay, 500)
+        XCTAssertEqual(next.lastDailyRank, .genius)
+        XCTAssertEqual(next.lastDailyPegsLeft, 1)
     }
 
     func testSecondClaimSameDayIsNoOp() {

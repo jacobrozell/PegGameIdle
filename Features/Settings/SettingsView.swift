@@ -1,15 +1,16 @@
 import SwiftUI
 import PegGameDomain
 
-/// App settings: feedback preferences, legal/support links, and the destructive
-/// "reset all progress" action.
+/// App settings: feedback preferences, legal/support links, and destructive reset.
 struct SettingsView: View {
     @Bindable var viewModel: SettingsViewModel
-    /// Used only for the destructive reset action.
     let gameViewModel: GameViewModel
 
     @Environment(\.dismiss) private var dismiss
     @State private var confirmingReset = false
+    @State private var exportText = ""
+    @State private var importText = ""
+    @State private var importMessage: String?
 
     var body: some View {
         NavigationStack {
@@ -19,6 +20,33 @@ struct SettingsView: View {
                         .accessibilityIdentifier("settings-haptics-toggle")
                     Toggle("Sound", isOn: $viewModel.soundEnabled)
                         .accessibilityIdentifier("settings-sound-toggle")
+                    Toggle("Ambient motion", isOn: $viewModel.ambientParticlesEnabled)
+                        .accessibilityIdentifier("settings-particles-toggle")
+                }
+
+                Section("Help") {
+                    Button("How to play") {
+                        dismiss()
+                        gameViewModel.requestOnboardingReplay()
+                    }
+                }
+
+                Section("Save Data") {
+                    ShareLink(item: gameViewModel.exportSaveJSON() ?? "{}") {
+                        Text("Export save JSON")
+                    }
+                    TextField("Paste save JSON to import", text: $importText, axis: .vertical)
+                        .lineLimit(3...6)
+                    Button("Import save") {
+                        if gameViewModel.importSaveJSON(importText) {
+                            importMessage = "Save imported."
+                        } else {
+                            importMessage = "Invalid save data."
+                        }
+                    }
+                    if let importMessage {
+                        Text(importMessage).font(.caption).foregroundStyle(.secondary)
+                    }
                 }
 
                 Section("About") {
