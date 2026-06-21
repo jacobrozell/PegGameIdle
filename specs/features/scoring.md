@@ -53,14 +53,14 @@ bonus          = boardEarnings × (completionMult − 1) × streakMult
   consumes a run you're mid-solve), earns per-jump points only at ×1, no
   completion bonus, no streak — the floor. Its board auto-deals on finish.
 
-## Out of scope (v1)
+## Out of scope (1.0)
 - Real-time streak *decay* (we reset on a weak finish instead).
 - Special pegs, board-size tiers, custom objectives.
 
 ---
 
 ### Verification
-- Target release: v1.1
+- Target release: 1.0
 - Last verified: 2026-06-20 (spec authored; implementation follows this commit)
 - Commit: _this branch_
 - Primary code paths: `Sources/PegGameDomain/BoardRank.swift`,

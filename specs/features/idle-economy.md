@@ -73,7 +73,7 @@ lastSeen) is saved on every economy mutation via `GameStateRepository`.
 ---
 
 ### Verification
-- Target release: v1.0
+- Target release: 1.0
 - Last verified: 2026-06-20 (code review; tests **not run** — no Swift toolchain)
 - Commit: _initial scaffold_
 - Primary code paths: `Sources/PegGameDomain/Economy/*.swift`,

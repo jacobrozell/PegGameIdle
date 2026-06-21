@@ -32,7 +32,7 @@ public struct GameState: Equatable, Sendable, Codable {
     /// When earnings were last reconciled. Drives offline accrual.
     public var lastSeen: Date
 
-    // MARK: v2 meta-progression
+    // MARK: Meta-progression (achievements, stats)
 
     /// Boards finished (manual, normal or daily).
     public var totalBoardsCompleted: Int
@@ -119,7 +119,12 @@ public struct GameState: Equatable, Sendable, Codable {
 
     public func level(of kind: UpgradeKind) -> Int { upgradeLevels[kind] ?? 0 }
 
-    public func isMaxLevel(_ kind: UpgradeKind) -> Bool { level(of: kind) >= UpgradeKind.maxLevel }
+    public func isMaxLevel(_ kind: UpgradeKind) -> Bool { level(of: kind) >= kind.levelCap }
+
+    /// Active human-board geometry from the Board Size upgrade.
+    public var boardLayout: BoardLayout {
+        UpgradeEffect.boardLayout(level: level(of: .boardSize))
+    }
 
     // MARK: Derived effects
 

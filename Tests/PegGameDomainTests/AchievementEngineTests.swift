@@ -35,8 +35,9 @@ final class AchievementEngineTests: XCTestCase {
     }
 
     func testAchievementMultiplierScalesAndCaps() {
-        let mult12 = AchievementEngine.achievementMultiplier(unlocked: Set(AchievementID.allCases))
-        XCTAssertEqual(mult12, 1.12, accuracy: 0.001)
+        let all = Set(AchievementID.allCases)
+        let mult = AchievementEngine.achievementMultiplier(unlocked: all)
+        XCTAssertEqual(mult, 1 + Double(all.count) * AchievementEngine.bonusPerAchievement, accuracy: 0.001)
         XCTAssertEqual(AchievementEngine.maxBonus, 0.15)
     }
 }

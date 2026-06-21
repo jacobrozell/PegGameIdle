@@ -4,32 +4,32 @@ Living document. The full domain-agnostic template (agent query template, prompt
 library, phase detail) was provided at project kickoff; this copy tracks **our**
 progress against it. Check boxes, add dates + commit hashes as phases complete.
 
-**Owner decisions (locked for v1.0):**
+**Owner decisions (locked for 1.0):**
 
 | Decision | Value |
 |----------|-------|
 | App name / bundle ID | Peg Game Idle / `com.jacobrozell.peggameidle` |
 | Min iOS | 17.0 (SwiftData-ready, `@Observable`) |
 | Swift | 5.9 |
-| Bundled locale (v1) | `en` only |
-| Telemetry | none in v1 (hooks deferred to Phase 14) |
-| Tip/donate link | none for v1 (`AppLinks.tipJar = nil`) |
+| Bundled locale (1.0) | `en` only |
+| Telemetry | none in 1.0 (hooks deferred to Phase 14) |
+| Tip/donate link | none for 1.0 (`AppLinks.tipJar = nil`) |
 | Orientation | portrait on iPhone; all orientations on iPad |
-| MVP scope | classic 15-hole board, manual play, Auto-Jumper idle loop, 3 upgrades, offline accrual, local persistence |
+| MVP scope | peg solitaire idle loop, upgrades, offline accrual, local persistence — polished UI on `plan/ui-overhaul` ahead of **1.0.0** tag |
 
 ## Source-of-truth hierarchy
 
 governance/spec index → system specs → feature specs → `docs/feature-inventory.md`
 (what ships today) → `docs/brainstorm.md` (maybe, not authoritative).
 
-## v2 UI overhaul (in progress)
+## 1.0 polish (in progress)
 
 **Plan:** [`docs/ui-overhaul-plan.md`](ui-overhaul-plan.md) · **Branch:** `plan/ui-overhaul`
 
 13 phases: design system → tab shell → feedback/haptics → board motion → onboarding →
 designed sheets → achievements → upgrade polish → daily tab → prestige UX → launch splash →
 a11y hardening → CI/release. Domain stays mostly unchanged; presentation layer rebuilt
-using ScrollBloom patterns as reference.
+using ScrollBloom patterns as reference. **No public release until `1.0.0` tag.**
 
 ## Architecture at a glance
 
@@ -65,7 +65,8 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 | 7 (partial) Adaptive layout | 2026-06-20 | _follow-up_ | iPad-landscape two-column vs stacked via `AdaptiveLayout` (idiom-based, +3 unit tests); offline "reserve full" cue. iPad side-by-side + Dynamic Type still need device QA. |
 | 8 (partial) Settings | 2026-06-20 | _follow-up_ | Settings sheet (haptics/sound prefs, About links, reset-all-data with confirm), `AppLinks` registry (tip jar nil/hidden), `SettingsStore` protocol + impls. |
 | 12 (partial) CI | 2026-06-20 | _follow-up_ | GitHub Actions (latest-stable Xcode): `swift test` (domain, 48 green) + xcodegen + `xcodebuild test` running hosted app unit tests (player interaction + drag) on a simulator. |
-| Remaining | | | History/lists, localization, a11y hardening, full CI matrix, release gating, legal pages, release QA. |
+| 1.0 polish (partial) | 2026-06-20 | _in progress_ | Tab shell, design system, sheets/toasts, achievements, onboarding, haptics/sound, themes, undo/hint, board size upgrade, center peg bonus. 67 domain tests + CI green on simulator. |
+| Remaining | | | Localization, a11y hardening, legal pages, release QA, **1.0.0 tag**. |
 
 ---
 
@@ -109,14 +110,14 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 - [x] 4.2 Repository protocols + impls behind them
 - [x] 4.3 Single dependency container (`AppDependencies`)
 - [x] 4.6 Features depend on `any GameStateRepository`
-- [ ] 4.1 Versioned schema / migration (deferred — UserDefaults JSON for v1)
+- [ ] 4.1 Versioned schema / migration (deferred — UserDefaults JSON for 1.0)
 
 ### Phase 5 — App shell
 - [x] 5.1 `@main` + bootstrap
-- [x] 5.2 Root navigation (NavigationStack)
+- [x] 5.2 Root navigation (4-tab `TabView` + `RootView`)
 - [x] 5.5 Launch-argument handling (`-reset_state`, `-disable_telemetry`) in `AppDependencies.live()`
+- [x] 5.4 Onboarding (first-run walkthrough)
 - [ ] 5.3 Router for deep links
-- [ ] 5.4 Onboarding
 - [ ] 5.6 Release-surface gate module
 
 ### Phase 6 — First vertical slice
@@ -134,9 +135,9 @@ Dependency rule: `Domain` imports nothing app-specific. Features depend on
 - [ ] 7.2 Non-color state indicators audit across all surfaces
 - [ ] iPad side-by-side + Dynamic Type need device QA (no simulator here)
 
-### Phases 8–18 — Not started
-Settings/AppLinks, history, localization wrapper, a11y hardening, full CI
-matrix, release-surface gating, legal pages, release QA.
+### Phases 8–18 — Remaining
+Localization wrapper, a11y hardening, full CI matrix, release-surface gating,
+legal pages, release QA, **1.0.0 tag**.
 
 ---
 

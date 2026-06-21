@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ToastView: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let item: ToastItem
 
@@ -33,15 +34,15 @@ struct ToastView: View {
     @ViewBuilder
     private var toastBackground: some View {
         if dynamicTypeSize.usesLargeTypeLayout {
-            RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Theme.Colors.surfaceElevated)
+            RoundedRectangle(cornerRadius: 16, style: .continuous).fill(theme.surfaceElevated)
         } else {
-            Capsule().fill(Theme.Colors.surfaceElevated)
+            Capsule().fill(theme.surfaceElevated)
         }
     }
 
     @ViewBuilder
     private var toastBorder: some View {
-        let stroke = item.isAchievement ? Theme.Colors.prestige : Theme.Colors.accent
+        let stroke = item.isAchievement ? theme.prestige : theme.accent
         if dynamicTypeSize.usesLargeTypeLayout {
             RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(stroke, lineWidth: 1.5)
         } else {

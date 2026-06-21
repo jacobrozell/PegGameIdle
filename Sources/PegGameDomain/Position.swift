@@ -4,7 +4,7 @@ import Foundation
 ///
 /// The board is a triangle where row `r` contains `r + 1` holes, indexed
 /// `0...r`. Row 0 is the single hole at the apex. This mirrors the physical
-/// Cracker Barrel board (5 rows, 15 holes) but is generalized to any size.
+/// Triangular grid coordinates. The classic 15-hole board uses `size: 5`.
 public struct Position: Hashable, Sendable, Comparable, Codable {
     public let row: Int
     public let col: Int

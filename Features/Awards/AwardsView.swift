@@ -3,6 +3,7 @@ import PegGameDomain
 
 struct AwardsView: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
 
     var body: some View {
         NavigationStack {
@@ -40,6 +41,7 @@ struct AwardsView: View {
 }
 
 private struct AchievementRow: View {
+    @Environment(\.themePalette) private var theme
     let definition: AchievementDefinition
     let unlocked: Bool
 
@@ -49,7 +51,7 @@ private struct AchievementRow: View {
                 HStack(spacing: Theme.Spacing.md) {
                     Image(systemName: unlocked ? definition.icon : "lock.fill")
                         .font(.title2)
-                        .foregroundStyle(unlocked ? Theme.Colors.prestige : .secondary)
+                        .foregroundStyle(unlocked ? theme.prestige : .secondary)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(unlocked ? definition.title : "???")
                             .font(.subheadline.weight(.bold))
@@ -60,7 +62,7 @@ private struct AchievementRow: View {
                     Spacer()
                     if unlocked {
                         Image(systemName: "checkmark.seal.fill")
-                            .foregroundStyle(Theme.Colors.success)
+                            .foregroundStyle(theme.success)
                     }
                 }
                 VStack(alignment: .leading, spacing: 6) {

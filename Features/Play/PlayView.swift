@@ -5,6 +5,7 @@ import PegGameDomain
 /// Play tab: board, status, prestige meter, and New Board control.
 struct PlayView: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
     @Binding var showSettings: Bool
 
     var body: some View {
@@ -44,6 +45,7 @@ struct PlayView: View {
             VStack(spacing: Theme.Spacing.xl) {
                 CurrencyHeader()
                 BoardView()
+                gameplayControls
                 statusLine
                 PrestigeMeter()
                 if game.canPrestige {
@@ -62,6 +64,7 @@ struct PlayView: View {
             VStack(spacing: Theme.Spacing.lg) {
                 CurrencyHeader()
                 BoardView()
+                gameplayControls
                 statusLine
                 newBoardButton
             }
@@ -76,14 +79,55 @@ struct PlayView: View {
         .padding(Theme.Spacing.xl)
     }
 
+    private var gameplayControls: some View {
+        HStack(spacing: Theme.Spacing.md) {
+            Button {
+                game.undoLastMove()
+            } label: {
+                Label("Undo", systemImage: "arrow.uturn.backward")
+                    .frame(maxWidth: .infinity, minHeight: Theme.Metrics.minTouchTarget)
+            }
+            .disabled(!game.canUndo)
+            .opacity(game.canUndo ? 1 : 0.35)
+            .accessibilityIdentifier(A11yID.undoButton)
+
+            Button {
+                game.showHint()
+            } label: {
+                Label("Hint", systemImage: "lightbulb")
+                    .frame(maxWidth: .infinity, minHeight: Theme.Metrics.minTouchTarget)
+            }
+            .disabled(!game.canHint)
+            .opacity(game.canHint ? 1 : 0.35)
+            .accessibilityIdentifier(A11yID.hintButton)
+
+            if game.hasActiveHint {
+                Button {
+                    game.clearHint()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .frame(width: Theme.Metrics.minTouchTarget, height: Theme.Metrics.minTouchTarget)
+                }
+                .accessibilityLabel("Clear hint")
+                .accessibilityIdentifier(A11yID.clearHintButton)
+            }
+        }
+        .buttonStyle(.plain)
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(theme.accent)
+    }
+
     private var statusLine: some View {
         Group {
             if game.isDailyMode {
                 Label("Daily Puzzle — solve it!", systemImage: "calendar")
-                    .foregroundStyle(Theme.Colors.accent)
+                    .foregroundStyle(theme.accent)
+            } else if !game.board.layout.displayName.isEmpty && game.board.layout.size > 5 {
+                Label("\(game.boardLayoutName) · \(game.pegsRemaining) pegs left", systemImage: "square.grid.3x3")
+                    .foregroundStyle(.secondary)
             } else if game.streakCount > 1 {
                 Label("\(game.streakCount)× streak — \(game.pegsRemaining) pegs left", systemImage: "flame.fill")
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(theme.warning)
             } else {
                 Text("\(game.pegsRemaining) pegs remaining")
                     .foregroundStyle(.secondary)
@@ -97,10 +141,14 @@ struct PlayView: View {
         Button {
             game.dealNormalBoard()
         } label: {
-            Label("New Board", systemImage: "arrow.clockwise")
+            Label(
+                game.isDailyMode ? "Exit Daily" : "New Board",
+                systemImage: game.isDailyMode ? "xmark.circle" : "arrow.clockwise"
+            )
         }
         .buttonStyle(.brandedPrimary)
         .accessibilityIdentifier(A11yID.newBoard)
+        .accessibilityLabel(game.isDailyMode ? "Exit daily puzzle" : "New board")
     }
 
     private var prestigeButton: some View {

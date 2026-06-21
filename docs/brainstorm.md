@@ -22,7 +22,7 @@ Plain peg solitaire is a one-and-done puzzle. We layer an idle economy on top:
 - The human still matters: playing by hand is faster and more skillful than the
   idle baseline, and a perfect solve (one peg left) is the bragging-rights goal.
 
-## Gameflow mechanics — v1.x direction (decisions locked 2026-06-20)
+## Gameflow mechanics — 1.0 direction (decisions locked 2026-06-20)
 
 Still non-authoritative; promote to specs before building. These came out of a
 brainstorm on making scoring reward skill and giving daily reasons to return.
@@ -78,15 +78,15 @@ brainstorm on making scoring reward skill and giving daily reasons to return.
 - Works fully offline; Game Center "fewest pegs" leaderboards layer on later
   since the board is deterministic.
 
-### Backlog spice (not v1)
+### Backlog spice (post-1.0)
 - Special pegs (golden = bonus, locked = must clear last).
 - Board-size tiers as upgrades.
 - "Leave the center peg" challenge objectives.
 
-## Backlog ideas (not in v1)
+## Backlog ideas (post-1.0)
 
 - Larger board tiers (size 6, 7…) as an upgrade — `BoardLayout(size:)` supports
-  it; UI is classic-only for v1.
+  it; daily puzzle stays classic 15-hole for 1.0.
 - Cosmetic peg skins, haptics, sound.
 - Game Center leaderboards for fewest pegs remaining.
 

@@ -75,4 +75,21 @@ public struct Board: Equatable, Sendable, Codable {
         var copy = self
         return copy.apply(move) ? copy : nil
     }
+
+    /// Reverses a previously applied legal move, restoring the jumped peg.
+    @discardableResult
+    public mutating func reverse(_ move: Move) -> Bool {
+        guard
+            layout.contains(move.from),
+            layout.contains(move.over),
+            layout.contains(move.to),
+            pegs.contains(move.to),
+            !pegs.contains(move.from),
+            !pegs.contains(move.over)
+        else { return false }
+        pegs.remove(move.to)
+        pegs.insert(move.from)
+        pegs.insert(move.over)
+        return true
+    }
 }

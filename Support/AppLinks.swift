@@ -13,6 +13,6 @@ public enum AppLinks {
     public static let accessibility = URL(string: "\(pagesBase)/accessibility.html")!
 
     /// Optional tip/donate link. `nil` hides the row entirely (owner decision:
-    /// no tip jar in v1).
+    /// no tip jar in 1.0).
     public static let tipJar: URL? = nil
 }

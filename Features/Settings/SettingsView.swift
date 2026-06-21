@@ -15,6 +15,8 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+                ThemePickerSection(selection: $viewModel.colorTheme)
+
                 Section("Feedback") {
                     Toggle("Haptics", isOn: $viewModel.hapticsEnabled)
                         .accessibilityIdentifier("settings-haptics-toggle")

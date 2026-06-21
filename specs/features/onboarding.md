@@ -1,4 +1,4 @@
-# Onboarding Spec (v2 — draft)
+# Onboarding Spec (1.0 — draft)
 
 > **Status:** Draft on `plan/ui-overhaul`. Not authoritative until Phase 5 ships.
 
@@ -28,7 +28,7 @@ Launch arg `-ui_test_show_onboarding` forces sheet regardless of save state.
 
 | Field | Value |
 |-------|-------|
-| Target release | v2.0 |
+| Target release | 1.0 |
 | Last verified | — |
 | Commit | — |
 | Code | `Features/Onboarding/OnboardingView.swift` |

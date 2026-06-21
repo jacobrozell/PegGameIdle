@@ -15,7 +15,7 @@ public extension GameStateRepository {
 }
 
 /// Simple `UserDefaults`-backed store. The state is small (a few numbers and
-/// upgrade levels), so JSON in user defaults is sufficient for v1; migration to
+/// upgrade levels), so JSON in user defaults is sufficient for 1.0; migration to
 /// SwiftData is a Phase-4 follow-up if the schema grows.
 public final class UserDefaultsGameStateRepository: GameStateRepository {
     private let defaults: UserDefaults

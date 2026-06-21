@@ -1,7 +1,6 @@
 import Foundation
 
-/// The end-of-board grade, in Cracker Barrel tradition. Maps the number of pegs
-/// left to a flavor name and a completion-bonus multiplier. Pure domain logic.
+/// End-of-board grade from pegs remaining. Maps count to a label and completion multiplier.
 public enum BoardRank: String, CaseIterable, Sendable, Codable {
     case genius
     case purtySmart
@@ -19,10 +18,10 @@ public enum BoardRank: String, CaseIterable, Sendable, Codable {
 
     public var displayName: String {
         switch self {
-        case .genius:        return "Genius"
-        case .purtySmart:    return "Purty Smart"
-        case .justPlainDumb: return "Just Plain Dumb"
-        case .egNoRaMoose:   return "Eg-no-ra-moose"
+        case .genius:        return "Expert"
+        case .purtySmart:    return "Sharp"
+        case .justPlainDumb: return "Fair"
+        case .egNoRaMoose:   return "Rough"
         }
     }
 

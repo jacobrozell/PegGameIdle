@@ -145,7 +145,7 @@ final class GameViewModelTests: XCTestCase {
 
     func testToastQueueDrainsOnDismiss() {
         let vm = makeViewModel(state: GameState(totalBoardsCompleted: 1, bestRank: .genius))
-        vm.evaluateAchievements(for: .boardCompleted(pegsLeft: 1))
+        vm.evaluateAchievements(for: .boardCompleted(pegsLeft: 1, landedCenterPeg: false))
         XCTAssertNotNil(vm.toast)
         let firstMessage = vm.toast?.message
         vm.dismissCurrentToast()
@@ -161,5 +161,54 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(vm.pegPoints, 0)
         XCTAssertEqual(vm.pegsRemaining, 14)
         XCTAssertFalse(vm.isDailyMode)
+    }
+
+    func testUndoRevertsLastManualJump() {
+        let vm = makeViewModel()
+        vm.tap(jumper)
+        vm.tap(apex)
+        XCTAssertEqual(vm.pegsRemaining, 13)
+        XCTAssertGreaterThan(vm.pegPoints, 0)
+        vm.undoLastMove()
+        XCTAssertEqual(vm.pegsRemaining, 14)
+        XCTAssertEqual(vm.pegPoints, 0)
+    }
+
+    func testHintHighlightsSuggestedMove() {
+        let vm = makeViewModel()
+        vm.showHint()
+        XCTAssertNotNil(vm.hintMove)
+        XCTAssertEqual(vm.hintMove?.from, jumper)
+        XCTAssertEqual(vm.hintMove?.to, apex)
+    }
+
+    func testBoardSizeUpgradeStartsOnLargerBoard() {
+        let vm = makeViewModel(state: GameState(upgradeLevels: [.boardSize: 1]))
+        XCTAssertEqual(vm.pegsRemaining, 20)
+        XCTAssertEqual(vm.board.layout.size, 6)
+    }
+
+    func testImportSaveClearsDailyModeAndSheets() {
+        let vm = makeViewModel()
+        vm.startDailyPuzzle()
+        XCTAssertTrue(vm.isDailyMode)
+        let json = vm.exportSaveJSON() ?? ""
+        vm.startDailyPuzzle()
+        XCTAssertTrue(vm.importSaveJSON(json))
+        XCTAssertFalse(vm.isDailyMode)
+        XCTAssertNil(vm.dailyResult)
+    }
+
+    func testDealNormalBoardExitsDailyMode() {
+        let vm = makeViewModel()
+        vm.startDailyPuzzle()
+        vm.dealNormalBoard()
+        XCTAssertFalse(vm.isDailyMode)
+    }
+
+    func testUndoDoesNothingWhenStackEmpty() {
+        let vm = makeViewModel()
+        vm.undoLastMove()
+        XCTAssertEqual(vm.pegsRemaining, 14)
     }
 }

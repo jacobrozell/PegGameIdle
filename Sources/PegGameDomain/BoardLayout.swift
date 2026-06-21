@@ -2,7 +2,7 @@ import Foundation
 
 /// The geometry of a triangular peg board, independent of which holes are filled.
 ///
-/// `size` is the number of rows. The classic Cracker Barrel board is `size: 5`
+/// `size` is the number of rows. The classic board is `size: 5` (15 holes).
 /// (15 holes). Larger sizes are used by the idle game's board-upgrade tiers.
 public struct BoardLayout: Equatable, Sendable, Codable {
     public let size: Int
@@ -31,4 +31,13 @@ public struct BoardLayout: Equatable, Sendable, Codable {
     }
 
     public static let classic = BoardLayout(size: 5)
+
+    /// Traditional ideal finishing hole — center of the bottom row.
+    public var centerPosition: Position {
+        Position(row: size - 1, col: (size - 1) / 2)
+    }
+
+    public var displayName: String {
+        size == 5 ? "Classic" : "\(holeCount)-hole"
+    }
 }

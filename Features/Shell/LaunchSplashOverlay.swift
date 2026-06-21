@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct LaunchSplashOverlay<Content: View>: View {
+    @Environment(\.themePalette) private var theme
     @ViewBuilder var content: () -> Content
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -20,14 +21,14 @@ struct LaunchSplashOverlay<Content: View>: View {
 
     private var splash: some View {
         ZStack {
-            Theme.Colors.background.opacity(scrimOpacity)
+            theme.background.opacity(scrimOpacity)
             VStack(spacing: 16) {
                 Image(systemName: "circle.grid.3x3.fill")
                     .font(.system(size: 72))
-                    .foregroundStyle(Theme.Colors.peg)
+                    .foregroundStyle(theme.peg)
                 Text("Peg Game Idle")
                     .font(.title2.weight(.bold))
-                    .foregroundStyle(Theme.Colors.accent)
+                    .foregroundStyle(theme.accent)
             }
             .opacity(logoOpacity)
         }

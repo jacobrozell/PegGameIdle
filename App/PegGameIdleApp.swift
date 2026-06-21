@@ -3,11 +3,11 @@ import SwiftUI
 @main
 struct PegGameIdleApp: App {
     @State private var gameViewModel: GameViewModel
-    private let settingsStore: SettingsStore
+    @State private var settingsViewModel: SettingsViewModel
 
     init() {
         let deps = AppDependencies.live()
-        settingsStore = deps.settingsStore
+        _settingsViewModel = State(initialValue: SettingsViewModel(store: deps.settingsStore))
         _gameViewModel = State(initialValue: GameViewModel(
             repository: deps.gameStateRepository,
             settingsStore: deps.settingsStore
@@ -15,11 +15,13 @@ struct PegGameIdleApp: App {
     }
 
     var body: some Scene {
+        @Bindable var settings = settingsViewModel
         WindowGroup {
             LaunchSplashOverlay {
-                RootView(settingsStore: settingsStore)
+                RootView(settingsViewModel: settingsViewModel)
                     .environment(gameViewModel)
             }
+            .environment(\.themePalette, settings.colorTheme.palette)
         }
     }
 }

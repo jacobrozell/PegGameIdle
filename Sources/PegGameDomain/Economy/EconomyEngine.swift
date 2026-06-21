@@ -27,6 +27,16 @@ public enum EconomyEngine {
         return next
     }
 
+    /// Reverses one manual jump's economy effects (used by Undo).
+    public static func revertManualJump(reward: Double, in state: GameState) -> GameState {
+        var next = state
+        next.pegPoints = max(0, next.pegPoints - reward)
+        next.lifetimePegPointsEarned = max(0, next.lifetimePegPointsEarned - reward)
+        next.totalPegsJumped = max(0, next.totalPegsJumped - 1)
+        next.manualJumps = max(0, next.manualJumps - 1)
+        return next
+    }
+
     /// Cost to raise `kind` by one level from the current state.
     public static func cost(of kind: UpgradeKind, in state: GameState) -> Double {
         kind.cost(atLevel: state.level(of: kind))
@@ -38,7 +48,7 @@ public enum EconomyEngine {
         var total = 0.0
         var level = state.level(of: kind)
         for _ in 0..<levels {
-            guard level < UpgradeKind.maxLevel else { break }
+            guard level < kind.levelCap else { break }
             total += kind.cost(atLevel: level)
             level += 1
         }
@@ -50,7 +60,7 @@ public enum EconomyEngine {
         var remaining = state.pegPoints
         var level = state.level(of: kind)
         var count = 0
-        while level < UpgradeKind.maxLevel {
+        while level < kind.levelCap {
             let price = kind.cost(atLevel: level)
             guard remaining >= price else { break }
             remaining -= price
@@ -62,7 +72,7 @@ public enum EconomyEngine {
 
     /// Buys one level of `kind`. Throws if funds are insufficient or at max level.
     public static func purchase(_ kind: UpgradeKind, in state: GameState) throws -> GameState {
-        guard state.level(of: kind) < UpgradeKind.maxLevel else { throw PurchaseError.maxLevelReached }
+        guard state.level(of: kind) < kind.levelCap else { throw PurchaseError.maxLevelReached }
         let price = cost(of: kind, in: state)
         guard state.pegPoints >= price else {
             throw PurchaseError.insufficientFunds(needed: price, have: state.pegPoints)
@@ -143,6 +153,9 @@ public enum EconomyEngine {
     /// Per-streak-worthy-board bump to the completion bonus.
     public static let streakMultiplierStep: Double = 0.1
 
+    /// Extra multiplier when the last peg lands on the board's center hole.
+    public static let centerPegBonusMultiplier: Double = 1.5
+
     /// The outcome of a finished manual board, for the end-of-board tally.
     public struct BoardResult: Equatable, Sendable {
         public let pegsLeft: Int
@@ -152,6 +165,8 @@ public enum EconomyEngine {
         public let streakMultiplier: Double
         public let bonusAwarded: Double
         public let boardEarnings: Double
+        public let landedCenterPeg: Bool
+        public let centerPegBonusMultiplier: Double
     }
 
     private static func updateBestRank(_ rank: BoardRank, pegsLeft: Int, in state: inout GameState) {
@@ -175,16 +190,24 @@ public enum EconomyEngine {
     ///   - pegsLeft: pegs remaining when the board ran out of moves.
     ///   - boardEarnings: Peg Points earned from jumps during this run (the base
     ///     the completion multiplier scales).
-    public static func completeBoard(pegsLeft: Int, boardEarnings: Double, state: GameState) -> (state: GameState, result: BoardResult) {
+    public static func completeBoard(
+        pegsLeft: Int,
+        finalPeg: Position? = nil,
+        boardLayout: BoardLayout = .classic,
+        boardEarnings: Double,
+        state: GameState
+    ) -> (state: GameState, result: BoardResult) {
         let rank = BoardRank(pegsLeft: pegsLeft)
         let completionMult = rank.completionMultiplier(pegsLeft: pegsLeft)
+        let landedCenter = pegsLeft == 1 && finalPeg == boardLayout.centerPosition
+        let centerMult = landedCenter ? centerPegBonusMultiplier : 1.0
 
         var next = state
         next.streakCount = rank.isStreakWorthy ? state.streakCount + 1 : 0
         next.totalBoardsCompleted += 1
         updateBestRank(rank, pegsLeft: pegsLeft, in: &next)
         let streakMult = 1 + streakMultiplierStep * Double(next.streakCount)
-        let bonus = max(0, boardEarnings * (completionMult - 1) * streakMult)
+        let bonus = max(0, boardEarnings * (completionMult - 1) * streakMult * centerMult)
         next.pegPoints += bonus
         recordEarnings(bonus, in: &next)
 
@@ -197,7 +220,9 @@ public enum EconomyEngine {
                 streakCount: next.streakCount,
                 streakMultiplier: streakMult,
                 bonusAwarded: bonus,
-                boardEarnings: boardEarnings
+                boardEarnings: boardEarnings,
+                landedCenterPeg: landedCenter,
+                centerPegBonusMultiplier: centerMult
             )
         )
     }

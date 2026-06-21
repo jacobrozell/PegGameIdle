@@ -2,6 +2,7 @@ import SwiftUI
 import PegGameDomain
 
 struct BoardResultSheet: View {
+    @Environment(\.themePalette) private var theme
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let result: EconomyEngine.BoardResult
@@ -13,7 +14,7 @@ struct BoardResultSheet: View {
             VStack(spacing: Theme.Spacing.lg) {
                 Text(result.rank.displayName)
                     .font(.largeTitle.weight(.heavy))
-                    .foregroundStyle(Theme.Colors.accent)
+                    .foregroundStyle(theme.accent)
                     .scaleEffect(rankScale)
                     .accessibilityAddTraits(.isHeader)
 
@@ -26,12 +27,15 @@ struct BoardResultSheet: View {
                     if result.streakCount > 1 {
                         statRow("Streak", "\(result.streakCount)× (×\(String(format: "%.1f", result.streakMultiplier)))")
                     }
+                    if result.landedCenterPeg {
+                        statRow("Center peg", "×\(String(format: "%.1f", result.centerPegBonusMultiplier)) bonus")
+                    }
                     statRow("Bonus earned", "+\(NumberFormatting.compact(result.bonusAwarded))")
                 }
                 .font(.subheadline)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Theme.Spacing.md)
-                .background(RoundedRectangle(cornerRadius: 12).fill(Theme.Colors.surface))
+                .background(RoundedRectangle(cornerRadius: 12).fill(theme.surface))
 
                 Button("Play On") { dismiss() }
                     .buttonStyle(.brandedPrimary)

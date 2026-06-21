@@ -3,6 +3,7 @@ import PegGameDomain
 
 struct DailyView: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
 
     var body: some View {
         NavigationStack {
@@ -30,12 +31,12 @@ struct DailyView: View {
         HStack {
             Label("\(game.dailyStreak)-day streak", systemImage: "flame.fill")
                 .font(.headline)
-                .foregroundStyle(.orange)
+                .foregroundStyle(theme.warning)
             Spacer()
             if game.pendingPrestige > 0 {
                 Text("+\(game.pendingPrestige) prestige ready")
                     .font(.caption)
-                    .foregroundStyle(Theme.Colors.prestige)
+                    .foregroundStyle(theme.prestige)
             }
         }
         .accessibilityElement(children: .combine)
@@ -69,13 +70,13 @@ struct DailyView: View {
     private var solvedTodayContent: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
             Label("Solved today", systemImage: "checkmark.seal.fill")
-                .foregroundStyle(Theme.Colors.success)
+                .foregroundStyle(theme.success)
 
             if let rank = game.todayDailyRank {
                 HStack {
                     Text(rank.displayName)
                         .font(.headline)
-                        .foregroundStyle(Theme.Colors.accent)
+                        .foregroundStyle(theme.accent)
                     Spacer()
                     if let pegs = game.todayDailyPegsLeft {
                         Text("\(pegs) peg\(pegs == 1 ? "" : "s") left")
@@ -93,12 +94,23 @@ struct DailyView: View {
             }
             .buttonStyle(.brandedSecondary)
             .accessibilityIdentifier(A11yID.dailyViewBoard)
+
+            Button {
+                game.startDailyPuzzle()
+            } label: {
+                Label("Practice again", systemImage: "arrow.clockwise")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.plain)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(theme.accent)
+            .accessibilityIdentifier(A11yID.dailyPractice)
         }
     }
 
     private var subtitle: String {
         if game.dailyClaimedToday {
-            return "Come back tomorrow for a new seeded board."
+            return "Prestige claimed — practice won't change today's reward."
         }
         return "Same board for everyone today — prestige progress scales with rank."
     }
@@ -106,6 +118,7 @@ struct DailyView: View {
 
 struct DailyCalendarView: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
 
     private var today: Date { Date() }
     private var calendar: Calendar { Calendar.current }
@@ -160,16 +173,16 @@ struct DailyCalendarView: View {
 
             ZStack {
                 Circle()
-                    .fill(isToday ? Theme.Colors.accent.opacity(0.25) : Color.clear)
+                    .fill(isToday ? theme.accent.opacity(0.25) : Color.clear)
                     .frame(width: 28, height: 28)
                 if solved {
                     Image(systemName: "checkmark")
                         .font(.caption2.weight(.bold))
-                        .foregroundStyle(Theme.Colors.success)
+                        .foregroundStyle(theme.success)
                 } else {
                     Text("\(dayNum)")
                         .font(.caption2)
-                        .foregroundStyle(isToday ? Theme.Colors.accent : .primary)
+                        .foregroundStyle(isToday ? theme.accent : .primary)
                 }
             }
             .frame(height: 32)
@@ -181,6 +194,8 @@ struct DailyCalendarView: View {
 
     private func isSolved(_ date: Date) -> Bool {
         let dayNum = DailyPuzzle.dayNumber(for: date)
+        let todayNum = DailyPuzzle.dayNumber(for: today)
+        if dayNum > todayNum { return false }
         guard let lastDay = game.state.lastDailyDay else { return false }
         if dayNum > lastDay { return false }
         if dayNum == lastDay { return true }

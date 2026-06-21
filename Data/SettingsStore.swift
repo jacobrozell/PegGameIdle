@@ -6,6 +6,7 @@ public protocol SettingsStore: AnyObject {
     var hapticsEnabled: Bool { get set }
     var soundEnabled: Bool { get set }
     var ambientParticlesEnabled: Bool { get set }
+    var colorTheme: AppColorTheme { get set }
 }
 
 public final class UserDefaultsSettingsStore: SettingsStore {
@@ -13,6 +14,7 @@ public final class UserDefaultsSettingsStore: SettingsStore {
         static let haptics = "peggameidle.settings.haptics"
         static let sound = "peggameidle.settings.sound"
         static let particles = "peggameidle.settings.particles"
+        static let colorTheme = "peggameidle.settings.colorTheme"
     }
 
     private let defaults: UserDefaults
@@ -38,16 +40,37 @@ public final class UserDefaultsSettingsStore: SettingsStore {
         get { defaults.bool(forKey: Key.particles) }
         set { defaults.set(newValue, forKey: Key.particles) }
     }
+
+    public var colorTheme: AppColorTheme {
+        get {
+            guard
+                let raw = defaults.string(forKey: Key.colorTheme),
+                let theme = AppColorTheme(rawValue: raw)
+            else {
+                defaults.set(AppColorTheme.slate.rawValue, forKey: Key.colorTheme)
+                return .slate
+            }
+            return theme
+        }
+        set { defaults.set(newValue.rawValue, forKey: Key.colorTheme) }
+    }
 }
 
 public final class InMemorySettingsStore: SettingsStore {
     public var hapticsEnabled: Bool
     public var soundEnabled: Bool
     public var ambientParticlesEnabled: Bool
+    public var colorTheme: AppColorTheme
 
-    public init(hapticsEnabled: Bool = true, soundEnabled: Bool = true, ambientParticlesEnabled: Bool = true) {
+    public init(
+        hapticsEnabled: Bool = true,
+        soundEnabled: Bool = true,
+        ambientParticlesEnabled: Bool = true,
+        colorTheme: AppColorTheme = .slate
+    ) {
         self.hapticsEnabled = hapticsEnabled
         self.soundEnabled = soundEnabled
         self.ambientParticlesEnabled = ambientParticlesEnabled
+        self.colorTheme = colorTheme
     }
 }

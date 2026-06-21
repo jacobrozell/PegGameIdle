@@ -46,14 +46,14 @@ alreadyClaimed }` — drives the daily summary UI.
 
 All decode-tolerant (older saves default them).
 
-## Out of scope (v1)
+## Out of scope (1.0)
 - Game Center leaderboards (the board is deterministic, so this layers on later).
 - Variant board sizes/shapes; "finish this" pre-cleared layouts.
 
 ---
 
 ### Verification
-- Target release: v1.1
+- Target release: 1.0
 - Last verified: 2026-06-20 (spec authored; implementation follows this commit)
 - Commit: _this branch_
 - Primary code paths: `Sources/PegGameDomain/DailyPuzzle.swift`,

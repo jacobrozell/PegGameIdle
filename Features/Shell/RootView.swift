@@ -10,13 +10,13 @@ struct RootView: View {
 
     @State private var showSettings = false
     @State private var showOnboarding = false
-    @State private var settingsViewModel: SettingsViewModel
+    @Bindable var settingsViewModel: SettingsViewModel
 
     private let ticker = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State private var lastTick = Date()
 
-    init(settingsStore: SettingsStore) {
-        _settingsViewModel = State(initialValue: SettingsViewModel(store: settingsStore))
+    init(settingsViewModel: SettingsViewModel) {
+        self.settingsViewModel = settingsViewModel
     }
 
     var body: some View {
@@ -45,7 +45,7 @@ struct RootView: View {
                 .tag(AppTab.awards)
                 .accessibilityIdentifier(A11yID.tabAwards)
         }
-        .tint(Theme.Colors.accent)
+        .tint(settingsViewModel.colorTheme.palette.accent)
         .overlay(alignment: .top) {
             if let toast = game.toast {
                 ToastView(item: toast)

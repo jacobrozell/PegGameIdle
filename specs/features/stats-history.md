@@ -1,10 +1,10 @@
-# Stats & History Spec (v2 — draft)
+# Stats & History Spec (1.0 — draft)
 
 > **Status:** Draft on `plan/ui-overhaul`. Not authoritative until Phase 7 ships.
 
 ## Overview
 
-Lifetime counters displayed in the **Awards tab** below achievements. Read-only; no separate History tab in v2.0.
+Lifetime counters displayed in the **Awards tab** below achievements. Read-only; no separate History tab in 1.0.
 
 ## Displayed stats
 
@@ -21,7 +21,7 @@ Lifetime counters displayed in the **Awards tab** below achievements. Read-only;
 
 Extend `GameState` or add `StatsSnapshot` computed from persisted fields. Backfill lifetime earned from existing data where possible on migration.
 
-## Future (v2.1+)
+## Future (post-1.0)
 
 - Per-board run log (last 20 ranks)
 - Game Center sync for daily fewest pegs
@@ -30,7 +30,7 @@ Extend `GameState` or add `StatsSnapshot` computed from persisted fields. Backfi
 
 | Field | Value |
 |-------|-------|
-| Target release | v2.0 |
+| Target release | 1.0 |
 | Last verified | — |
 | Commit | — |
 | Code | `Features/Awards/StatsSection.swift` |

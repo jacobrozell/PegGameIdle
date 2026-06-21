@@ -28,12 +28,12 @@
 
 ## Launch arguments (for deterministic UI runs)
 - `-reset_state` — clear persisted progress before launch.
-- `-disable_telemetry` — no analytics in tests (telemetry is off in v1 anyway).
+- `-disable_telemetry` — no analytics in tests (telemetry is off in 1.0 anyway).
 - (Future) `-enable_full_product_surface` — expose gated features for CI/dogfood.
 
 `-reset_state` and `-disable_telemetry` are honored in `AppDependencies.live()`:
 the former wipes persisted progress before launch, the latter forces telemetry
-off (which is already the v1 default). `PegGameIdleApp` uses `AppDependencies.live()`.
+off (which is already the 1.0 default). `PegGameIdleApp` uses `AppDependencies.live()`.
 
 ## Future (Phase 12)
 Split UI targets (`*UISmoke`, `*UIFeatures`, `*UIAccessibility`,

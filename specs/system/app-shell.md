@@ -1,4 +1,4 @@
-# App Shell Spec (v2 — draft)
+# App Shell Spec (1.0 — draft)
 
 > **Status:** Draft on `plan/ui-overhaul`. Not authoritative until Phase 2 ships.
 
@@ -59,7 +59,7 @@ See [`test-plan.md`](test-plan.md) for full launch-arg registry.
 
 | Field | Value |
 |-------|-------|
-| Target release | v2.0 |
+| Target release | 1.0 |
 | Last verified | — |
 | Commit | — |
 | Code | `Features/Shell/RootView.swift` (planned) |

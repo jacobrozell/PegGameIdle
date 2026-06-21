@@ -7,7 +7,7 @@ import PegGameDomain
 public final class AppDependencies {
     public let gameStateRepository: GameStateRepository
     public let settingsStore: SettingsStore
-    /// Whether analytics may emit. Off in v1 and forced off by `-disable_telemetry`.
+    /// Whether analytics may emit. Off in 1.0 and forced off by `-disable_telemetry`.
     public let telemetryEnabled: Bool
 
     public init(
@@ -27,7 +27,7 @@ public final class AppDependencies {
         if arguments.contains("-reset_state") {
             repository.reset()
         }
-        // Telemetry is not implemented in v1, so it ships off; `-disable_telemetry`
+        // Telemetry is not implemented in 1.0, so it ships off; `-disable_telemetry`
         // keeps it off for test/dogfood builds once it exists.
         let telemetry = false && !arguments.contains("-disable_telemetry")
         return AppDependencies(

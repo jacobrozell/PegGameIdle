@@ -12,6 +12,7 @@ public final class SettingsViewModel {
         self.hapticsEnabled = store.hapticsEnabled
         self.soundEnabled = store.soundEnabled
         self.ambientParticlesEnabled = store.ambientParticlesEnabled
+        self.colorTheme = store.colorTheme
     }
 
     public var hapticsEnabled: Bool {
@@ -24,5 +25,9 @@ public final class SettingsViewModel {
 
     public var ambientParticlesEnabled: Bool {
         didSet { store.ambientParticlesEnabled = ambientParticlesEnabled }
+    }
+
+    public var colorTheme: AppColorTheme {
+        didSet { store.colorTheme = colorTheme }
     }
 }

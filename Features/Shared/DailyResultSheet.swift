@@ -2,6 +2,7 @@ import SwiftUI
 import PegGameDomain
 
 struct DailyResultSheet: View {
+    @Environment(\.themePalette) private var theme
     @Environment(\.dismiss) private var dismiss
     let result: EconomyEngine.DailyResult
 
@@ -14,7 +15,7 @@ struct DailyResultSheet: View {
 
                 Text(result.rank.displayName)
                     .font(.title.weight(.heavy))
-                    .foregroundStyle(Theme.Colors.accent)
+                    .foregroundStyle(theme.accent)
 
                 VStack(spacing: Theme.Spacing.sm) {
                     statRow("Streak", "Day \(result.dailyStreak)")
@@ -23,7 +24,7 @@ struct DailyResultSheet: View {
                 .font(.subheadline)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Theme.Spacing.md)
-                .background(RoundedRectangle(cornerRadius: 12).fill(Theme.Colors.surface))
+                .background(RoundedRectangle(cornerRadius: 12).fill(theme.surface))
 
                 Button("Nice") { dismiss() }
                     .buttonStyle(.brandedPrimary)

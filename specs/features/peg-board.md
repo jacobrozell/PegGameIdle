@@ -45,14 +45,14 @@ specced in `scoring.md`. See also `idle-economy.md`.
   (Peg / Empty hole / Selected peg / Empty landing hole), and a hint.
 - 44pt targets. Landing holes use a glyph, not color alone.
 
-## Out of scope (v1)
+## Out of scope (1.0)
 - Board sizes other than classic (engine supports; UI does not).
 - Undo/redo, hints, seeded daily boards.
 
 ---
 
 ### Verification
-- Target release: v1.0
+- Target release: 1.0
 - Last verified: 2026-06-20 (code review; **not run** — no Swift toolchain in
   build environment)
 - Commit: _initial scaffold_

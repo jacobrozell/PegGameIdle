@@ -3,7 +3,7 @@ import Foundation
 /// Hooks for achievement evaluation after meaningful game actions.
 public enum GameEvent: Equatable, Sendable {
     case manualJump
-    case boardCompleted(pegsLeft: Int)
+    case boardCompleted(pegsLeft: Int, landedCenterPeg: Bool = false)
     case upgradePurchased(kind: UpgradeKind, newLevel: Int)
     case prestigePerformed(totalPrestiges: Int)
     case dailyCompleted(streak: Int)

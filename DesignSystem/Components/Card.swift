@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Card container used by shop rows and panels.
 struct Card<Content: View>: View {
+    @Environment(\.themePalette) private var theme
     var highlighted = false
     @ViewBuilder var content: () -> Content
     @ScaledMetric(relativeTo: .body) private var padding = 12
@@ -11,12 +12,12 @@ struct Card<Content: View>: View {
             .padding(padding)
             .background(
                 RoundedRectangle(cornerRadius: Theme.Metrics.cardRadius, style: .continuous)
-                    .fill(Theme.Colors.surfaceElevated)
+                    .fill(theme.surfaceElevated)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: Theme.Metrics.cardRadius, style: .continuous)
                     .stroke(
-                        highlighted ? Theme.Colors.cardHighlight : Theme.Colors.cardStroke,
+                        highlighted ? theme.cardHighlight : theme.cardStroke,
                         lineWidth: highlighted ? 1.5 : 1
                     )
             )

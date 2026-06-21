@@ -2,14 +2,16 @@ import SwiftUI
 
 /// Subtle gradient behind the peg board.
 struct PegBackground: View {
+    @Environment(\.themePalette) private var theme
+
     var body: some View {
         RoundedRectangle(cornerRadius: Theme.Metrics.cornerRadius, style: .continuous)
             .fill(
                 LinearGradient(
                     colors: [
-                        Theme.Colors.boardWood.opacity(0.95),
-                        Theme.Colors.boardWood.opacity(0.75),
-                        Color(red: 0.35, green: 0.22, blue: 0.12)
+                        theme.boardPrimary.opacity(0.95),
+                        theme.boardSecondary.opacity(0.85),
+                        theme.boardShadow
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -23,21 +25,17 @@ struct PegBackground: View {
     }
 }
 
-/// App-wide warm wood gradient background.
+/// App-wide gradient background.
 struct AppBackground: View {
     var showParticles: Bool
+    @Environment(\.themePalette) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        Theme.Colors.background
+        theme.background
             .overlay {
                 LinearGradient(
-                    colors: [
-                        Theme.Colors.background,
-                        Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
-                            ? UIColor(red: 0.12, green: 0.10, blue: 0.08, alpha: 1)
-                            : UIColor(red: 0.92, green: 0.86, blue: 0.78, alpha: 1) })
-                    ],
+                    colors: [theme.background, theme.backgroundGradientEnd],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -53,13 +51,14 @@ struct AppBackground: View {
 
 /// Subtle drifting peg silhouettes.
 struct AmbientParticlesView: View {
+    @Environment(\.themePalette) private var theme
     private let count = 10
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
                 ForEach(0..<count, id: \.self) { i in
-                    AmbientParticle(index: i, area: geo.size)
+                    AmbientParticle(index: i, area: geo.size, pegColor: theme.peg)
                 }
             }
         }
@@ -71,6 +70,7 @@ struct AmbientParticlesView: View {
 private struct AmbientParticle: View {
     let index: Int
     let area: CGSize
+    let pegColor: Color
     @State private var falling = false
 
     private func rand(_ salt: Int) -> Double {
@@ -86,7 +86,7 @@ private struct AmbientParticle: View {
         let delay = rand(5) * 6
 
         Circle()
-            .fill(Theme.Colors.peg.opacity(0.15))
+            .fill(pegColor.opacity(0.15))
             .frame(width: size, height: size)
             .position(
                 x: startX + (falling ? drift : 0),

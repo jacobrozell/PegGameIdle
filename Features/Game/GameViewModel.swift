@@ -30,7 +30,16 @@ public final class GameViewModel {
     public private(set) var animatingJump: (from: Position, to: Position)?
     public private(set) var shakePosition: Position?
     public private(set) var boardDealGeneration: Int = 0
+    public private(set) var hintMove: Move?
 
+    private struct UndoEntry {
+        let move: Move
+        let reward: Double
+        let earningsBefore: Double
+    }
+
+    private var undoStack: [UndoEntry] = []
+    private static let maxUndoDepth = 50
     private var currentBoardEarnings: Double = 0
     private var autoBoard: Board
     private let repository: GameStateRepository
@@ -47,8 +56,9 @@ public final class GameViewModel {
         let loaded = repository.load()
         let reconciled = EconomyEngine.reconcileOffline(now: now, state: loaded)
         self.state = reconciled.state
-        self.board = Board(layout: .classic, empty: Position(row: 0, col: 0))
-        self.autoBoard = Board(layout: .classic, empty: Position(row: 0, col: 0))
+        let layout = reconciled.state.boardLayout
+        self.board = Board(layout: layout, empty: Position(row: 0, col: 0))
+        self.autoBoard = Board(layout: layout, empty: Position(row: 0, col: 0))
         if reconciled.report.jumps > 0 {
             self.offlineReport = reconciled.report
         }
@@ -68,6 +78,11 @@ public final class GameViewModel {
     public var isDailyMode: Bool { mode == .daily }
     public var stats: StatsSnapshot { StatsSnapshot(state: state) }
     public var ambientParticlesEnabled: Bool { settingsStore.ambientParticlesEnabled }
+    public var boardLayoutName: String { board.layout.displayName }
+    public var canUndo: Bool { !undoStack.isEmpty && !board.isGameOver }
+    public var canHint: Bool { animatingJump == nil && !board.isGameOver && !board.legalMoves().isEmpty }
+    public var hasActiveHint: Bool { hintMove != nil }
+    public var isInteractionLocked: Bool { animatingJump != nil || board.isGameOver }
 
     public var affordableUpgradeCount: Int {
         UpgradeKind.allCases.filter { canAfford($0) && !state.isMaxLevel($0) }.count
@@ -144,6 +159,7 @@ public final class GameViewModel {
         currentBoardEarnings = 0
         boardDealGeneration += 1
         clearSelection()
+        clearUndoAndHint()
         selectedTab = .play
     }
 
@@ -171,12 +187,42 @@ public final class GameViewModel {
         showOnboardingRequest = true
     }
 
+    // MARK: Undo & hint
+
+    public func undoLastMove() {
+        guard canUndo, let entry = undoStack.last else { return }
+        guard board.reverse(entry.move) else { return }
+        undoStack.removeLast()
+        state = EconomyEngine.revertManualJump(reward: entry.reward, in: state)
+        currentBoardEarnings = entry.earningsBefore
+        animatingJump = nil
+        shakePosition = nil
+        clearSelection()
+        hintMove = nil
+        Haptics.light(settings: settingsStore)
+        persist()
+    }
+
+    public func showHint() {
+        guard canHint else { return }
+        hintMove = BoardHint.suggestedMove(on: board)
+        guard hintMove != nil else { return }
+        clearSelection()
+        Haptics.light(settings: settingsStore)
+    }
+
+    public func clearHint() {
+        hintMove = nil
+    }
+
     // MARK: Selection / input
 
     public func isSelected(_ position: Position) -> Bool { selection == position }
     public func isTarget(_ position: Position) -> Bool { targets.contains(position) }
 
     public func tap(_ position: Position) {
+        guard !isInteractionLocked else { return }
+        clearHint()
         if let selected = selection {
             if position == selected {
                 clearSelection()
@@ -196,6 +242,8 @@ public final class GameViewModel {
     }
 
     public func beginDrag(from position: Position) {
+        guard !isInteractionLocked else { return }
+        clearHint()
         select(position)
         if board.hasPeg(at: position) {
             Haptics.light(settings: settingsStore)
@@ -203,6 +251,7 @@ public final class GameViewModel {
     }
 
     public func endDrag(from position: Position, translation: CGSize) {
+        guard !isInteractionLocked else { clearSelection(); return }
         let candidates = board.legalMoves().filter { $0.from == position }
         guard !candidates.isEmpty else { clearSelection(); return }
 
@@ -239,7 +288,9 @@ public final class GameViewModel {
     }
 
     private func perform(_ move: Move, manual: Bool) {
+        guard animatingJump == nil, !board.isGameOver else { return }
         let reward = state.reward(forJumping: 1)
+        let earningsBefore = currentBoardEarnings
         animatingJump = (move.from, move.to)
         guard board.apply(move) else {
             animatingJump = nil
@@ -247,6 +298,11 @@ public final class GameViewModel {
         }
         state = EconomyEngine.awardJumps(1, to: state, manual: manual)
         currentBoardEarnings += reward
+        if manual {
+            if undoStack.count >= Self.maxUndoDepth { undoStack.removeFirst() }
+            undoStack.append(UndoEntry(move: move, reward: reward, earningsBefore: earningsBefore))
+            hintMove = nil
+        }
         clearSelection()
         Haptics.medium(settings: settingsStore)
         SoundEffects.jump(settings: settingsStore)
@@ -272,16 +328,24 @@ public final class GameViewModel {
 
     private func settleIfFinished() {
         guard board.isGameOver else { return }
+        undoStack.removeAll()
+        hintMove = nil
+        let finalPeg = board.pegs.first
         switch mode {
         case .normal:
             let outcome = EconomyEngine.completeBoard(
                 pegsLeft: board.pegCount,
+                finalPeg: finalPeg,
+                boardLayout: board.layout,
                 boardEarnings: currentBoardEarnings,
                 state: state
             )
             state = outcome.state
             boardResult = outcome.result
-            evaluateAchievements(for: .boardCompleted(pegsLeft: outcome.result.pegsLeft))
+            evaluateAchievements(for: .boardCompleted(
+                pegsLeft: outcome.result.pegsLeft,
+                landedCenterPeg: outcome.result.landedCenterPeg
+            ))
             Haptics.success(settings: settingsStore)
             SoundEffects.complete(settings: settingsStore)
             nudgeUpgradesIfNeeded()
@@ -306,7 +370,7 @@ public final class GameViewModel {
         var played = 0
         for _ in 0..<jumps {
             if autoBoard.isGameOver {
-                autoBoard = Board(layout: .classic, empty: Position(row: 0, col: 0))
+                autoBoard = Board(layout: state.boardLayout, empty: Position(row: 0, col: 0))
             }
             guard let move = autoPlayer.nextMove(on: autoBoard, using: &rng) else { break }
             autoBoard.apply(move)
@@ -328,11 +392,35 @@ public final class GameViewModel {
     // MARK: Board management
 
     public func dealNormalBoard(empty: Position = Position(row: 0, col: 0)) {
-        board = Board(layout: .classic, empty: empty)
+        let layout = state.boardLayout
+        board = Board(layout: layout, empty: empty)
         mode = .normal
         currentBoardEarnings = 0
         boardDealGeneration += 1
         clearSelection()
+        clearUndoAndHint()
+        syncAutoBoardLayoutIfNeeded()
+    }
+
+    private func syncAutoBoardLayoutIfNeeded() {
+        guard autoBoard.layout != state.boardLayout else { return }
+        autoBoard = Board(layout: state.boardLayout, empty: Position(row: 0, col: 0))
+    }
+
+    private func clearPresentationState() {
+        offlineReport = nil
+        boardResult = nil
+        dailyResult = nil
+        prestigePresentation = nil
+        toast = nil
+        toastQueue.removeAll()
+        showPrestigeCelebration = false
+        prestigeNudgeShown = false
+    }
+
+    private func clearUndoAndHint() {
+        undoStack.removeAll()
+        hintMove = nil
     }
 
     public func dismissOfflineReport() { offlineReport = nil }
@@ -342,15 +430,8 @@ public final class GameViewModel {
         repository.reset()
         state = repository.load()
         currentBoardEarnings = 0
-        offlineReport = nil
-        boardResult = nil
-        dailyResult = nil
-        prestigePresentation = nil
-        toast = nil
-        toastQueue.removeAll()
-        prestigeNudgeShown = false
+        clearPresentationState()
         upgradeNudgeShown = false
-        showPrestigeCelebration = false
         selectedTab = .play
         dealNormalBoard()
     }
@@ -362,10 +443,15 @@ public final class GameViewModel {
         state = EconomyEngine.purchaseBulk(kind, levels: levels, in: state)
         guard state.level(of: kind) > before else { return }
         evaluateAchievements(for: .upgradePurchased(kind: kind, newLevel: state.level(of: kind)))
+        if kind == .boardSize {
+            dealNormalBoard()
+            showToast("Board upgraded to \(state.boardLayout.displayName)")
+        } else {
+            showToast("\(kind.displayName) → Lv \(state.level(of: kind))")
+        }
         persist()
         Haptics.medium(settings: settingsStore)
         SoundEffects.purchase(settings: settingsStore)
-        showToast("\(kind.displayName) → Lv \(state.level(of: kind))")
     }
 
     public func canAfford(_ kind: UpgradeKind) -> Bool {
@@ -425,6 +511,8 @@ public final class GameViewModel {
             let imported = try? JSONDecoder().decode(GameState.self, from: data)
         else { return false }
         state = imported
+        clearPresentationState()
+        upgradeNudgeShown = false
         dealNormalBoard()
         persist()
         return true

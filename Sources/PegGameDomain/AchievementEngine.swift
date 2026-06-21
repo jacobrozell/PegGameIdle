@@ -22,7 +22,7 @@ public enum AchievementEngine {
         case .firstBoard:
             return state.totalBoardsCompleted >= 1
         case .genius:
-            if case .boardCompleted(let pegs) = event { return pegs <= 1 }
+            if case .boardCompleted(let pegs, _) = event { return pegs <= 1 }
             return state.bestRank == .genius
         case .streak3:
             return state.dailyStreak >= 3
@@ -33,7 +33,7 @@ public enum AchievementEngine {
         case .boards100:
             return state.totalBoardsCompleted >= 100
         case .upgradeMax:
-            return UpgradeKind.allCases.contains { state.level(of: $0) >= UpgradeKind.maxLevel }
+            return UpgradeKind.allCases.contains { state.level(of: $0) >= $0.levelCap }
         case .prestige1:
             return state.totalPrestiges >= 1
         case .prestige5:
@@ -42,6 +42,9 @@ public enum AchievementEngine {
             return state.lifetimePegPointsEarned >= 1_000
         case .pegPoints1m:
             return state.lifetimePegPointsEarned >= 1_000_000
+        case .centerPeg:
+            if case .boardCompleted(_, let center) = event { return center }
+            return false
         }
     }
 }

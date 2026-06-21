@@ -8,11 +8,17 @@ enum A11yID {
     static let pegPoints = "peg-points-value"
     static let statusLine = "status-line"
     static let newBoard = "new-board-button"
+    static let undoButton = "undo-button"
+    static let hintButton = "hint-button"
+    static let clearHintButton = "clear-hint-button"
+
+    static let themeOptionPrefix = "theme-option-"
     static let settingsButton = "settings-button"
     static let prestigeButton = "prestige-button"
     static let prestigeMeter = "prestige-meter"
     static let dailyPlay = "daily-play-button"
     static let dailyViewBoard = "daily-view-board-button"
+    static let dailyPractice = "daily-practice-button"
 
     static let upgradeRowPrefix = "upgrade-"
     static let achievementRowPrefix = "achievement-"

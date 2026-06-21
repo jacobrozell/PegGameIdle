@@ -7,6 +7,7 @@ enum BrandedButtonStyle {
 }
 
 struct BrandedButton: ButtonStyle {
+    @Environment(\.themePalette) private var theme
     var style: BrandedButtonStyle = .primary
     @Environment(\.isEnabled) private var isEnabled
 
@@ -24,8 +25,8 @@ struct BrandedButton: ButtonStyle {
 
     private var foreground: Color {
         switch style {
-        case .primary: return Color(red: 0.15, green: 0.08, blue: 0.02)
-        case .secondary: return Theme.Colors.accent
+        case .primary: return theme.primaryButtonForeground
+        case .secondary: return theme.accent
         case .destructive: return .white
         }
     }
@@ -35,10 +36,10 @@ struct BrandedButton: ButtonStyle {
         let pressed = configuration.isPressed
         switch style {
         case .primary:
-            Capsule().fill(Theme.Colors.accent.opacity(pressed ? 0.85 : 1))
+            Capsule().fill(theme.accent.opacity(pressed ? 0.85 : 1))
         case .secondary:
-            Capsule().strokeBorder(Theme.Colors.accent, lineWidth: 2)
-                .background(Capsule().fill(Theme.Colors.surface.opacity(pressed ? 0.7 : 1)))
+            Capsule().strokeBorder(theme.accent, lineWidth: 2)
+                .background(Capsule().fill(theme.surface.opacity(pressed ? 0.7 : 1)))
         case .destructive:
             Capsule().fill(Color.red.opacity(pressed ? 0.85 : 1))
         }

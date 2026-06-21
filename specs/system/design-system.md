@@ -1,4 +1,4 @@
-# Design System Spec (v2 — draft)
+# Design System Spec (1.0 — draft)
 
 > **Status:** Draft on `plan/ui-overhaul`. Not authoritative until Phase 1 ships.
 
@@ -63,7 +63,7 @@ Disable peg arc, particles, toast slide, and splash crossfade when Reduce Motion
 
 | Field | Value |
 |-------|-------|
-| Target release | v2.0 |
+| Target release | 1.0 |
 | Last verified | — |
 | Commit | — |
 | Code | `DesignSystem/` |

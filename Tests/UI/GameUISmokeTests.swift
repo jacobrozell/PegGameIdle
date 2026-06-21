@@ -16,6 +16,8 @@ final class GameUISmokeTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["peg-points-value"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.otherElements["status-line"].exists || app.staticTexts["status-line"].exists)
         XCTAssertTrue(app.buttons["new-board-button"].exists)
+        XCTAssertTrue(app.buttons["undo-button"].exists)
+        XCTAssertTrue(app.buttons["hint-button"].exists)
         XCTAssertTrue(app.buttons["hole-0-0"].exists)
 
         app.tabBars.buttons["tab-upgrades"].tap()

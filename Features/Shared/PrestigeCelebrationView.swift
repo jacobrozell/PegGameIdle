@@ -2,6 +2,7 @@ import SwiftUI
 
 /// Brief full-screen sparkle burst after prestiging (respects Reduce Motion).
 struct PrestigeCelebrationView: View {
+    @Environment(\.themePalette) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -12,7 +13,7 @@ struct PrestigeCelebrationView: View {
             VStack(spacing: Theme.Spacing.lg) {
                 Image(systemName: "star.circle.fill")
                     .font(.system(size: 72))
-                    .foregroundStyle(Theme.Colors.prestige)
+                    .foregroundStyle(theme.prestige)
                     .symbolEffect(.bounce, options: reduceMotion ? .nonRepeating : .repeating, value: reduceMotion)
 
                 Text("Prestiged!")
@@ -22,7 +23,7 @@ struct PrestigeCelebrationView: View {
             .padding(Theme.Spacing.xxl)
             .background(
                 RoundedRectangle(cornerRadius: Theme.Metrics.cornerRadius, style: .continuous)
-                    .fill(Theme.Colors.surfaceElevated.opacity(0.95))
+                    .fill(theme.surfaceElevated.opacity(0.95))
             )
             .shadow(radius: 24)
         }

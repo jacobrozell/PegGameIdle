@@ -27,7 +27,7 @@ Persistence (UserDefaults / SwiftData)──┘
   schemes, and build settings. The generated `.xcodeproj` is **git-ignored**.
 - The domain package is referenced as a local SwiftPM dependency.
 
-## Persistence (v1)
+## Persistence (1.0)
 - `GameState` is a `Codable` value type serialized as JSON in `UserDefaults`
   under `peggameidle.state.v1`.
 - Rationale: state is tiny (a few numbers + upgrade levels). SwiftData with a

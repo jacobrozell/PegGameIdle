@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PrestigeSheet: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
     @Environment(\.dismiss) private var dismiss
     let presentation: PrestigePresentation
 
@@ -24,7 +25,7 @@ struct PrestigeSheet: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(Theme.Spacing.md)
-                .background(RoundedRectangle(cornerRadius: 12).fill(Theme.Colors.surface))
+                .background(RoundedRectangle(cornerRadius: 12).fill(theme.surface))
 
                 Button("Prestige (\(fmt(presentation.projectedMultiplier)))") {
                     game.prestige()

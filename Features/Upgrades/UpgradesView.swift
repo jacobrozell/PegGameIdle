@@ -3,6 +3,7 @@ import PegGameDomain
 
 struct UpgradesView: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
 
     var body: some View {
         NavigationStack {
@@ -29,6 +30,7 @@ struct UpgradesView: View {
 
 struct UpgradeRow: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let kind: UpgradeKind
 
@@ -48,7 +50,7 @@ struct UpgradeRow: View {
                 HStack(spacing: Theme.Spacing.md) {
                     Image(systemName: kind.icon)
                         .font(.title2)
-                        .foregroundStyle(Theme.Colors.accent)
+                        .foregroundStyle(theme.accent)
                         .frame(width: 32, height: 32)
 
                     Text(kind.displayName)
@@ -85,8 +87,8 @@ struct UpgradeRow: View {
             .font(.caption2.weight(.bold))
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
-            .background(Capsule().fill(maxed ? Theme.Colors.success.opacity(0.2) : Theme.Colors.surface))
-            .foregroundStyle(maxed ? Theme.Colors.success : .secondary)
+            .background(Capsule().fill(maxed ? theme.success.opacity(0.2) : theme.surface))
+            .foregroundStyle(maxed ? theme.success : .secondary)
     }
 
     @ViewBuilder
@@ -94,7 +96,7 @@ struct UpgradeRow: View {
         if maxed {
             Text(game.effectDescription(for: kind))
                 .font(.caption.monospacedDigit())
-                .foregroundStyle(Theme.Colors.success)
+                .foregroundStyle(theme.success)
                 .lineLimit(2)
         } else if let next = game.nextEffectDescription(for: kind) {
             Text("\(game.effectDescription(for: kind)) → \(next)")
@@ -116,7 +118,7 @@ struct UpgradeRow: View {
                 Spacer()
                 Label("Fully upgraded", systemImage: "checkmark.seal.fill")
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(Theme.Colors.success)
+                    .foregroundStyle(theme.success)
                 Spacer()
             }
         } else {
@@ -145,7 +147,7 @@ struct UpgradeRow: View {
             }
             .frame(maxWidth: .infinity, minHeight: Self.actionRowHeight)
             .padding(.horizontal, 4)
-            .background(RoundedRectangle(cornerRadius: 8).fill(enabled ? Theme.Colors.accent.opacity(0.15) : Theme.Colors.surface))
+            .background(RoundedRectangle(cornerRadius: 8).fill(enabled ? theme.accent.opacity(0.15) : theme.surface))
         }
         .buttonStyle(.plain)
         .disabled(!enabled)

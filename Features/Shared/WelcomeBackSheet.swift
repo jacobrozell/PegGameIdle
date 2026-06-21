@@ -2,6 +2,7 @@ import SwiftUI
 import PegGameDomain
 
 struct WelcomeBackSheet: View {
+    @Environment(\.themePalette) private var theme
     @Environment(\.dismiss) private var dismiss
     let report: EconomyEngine.OfflineReport
 
@@ -20,7 +21,7 @@ struct WelcomeBackSheet: View {
 
                 Text("+\(NumberFormatting.compact(report.pegPointsEarned)) Peg Points")
                     .font(.largeTitle.weight(.heavy))
-                    .foregroundStyle(Theme.Colors.currency)
+                    .foregroundStyle(theme.currency)
 
                 breakdown
                     .accessibilityElement(children: .combine)
@@ -29,7 +30,7 @@ struct WelcomeBackSheet: View {
                 if report.wasCapped {
                     Text("Offline Reserve filled — upgrade it to bank more away time.")
                         .font(.caption)
-                        .foregroundStyle(Theme.Colors.warning)
+                        .foregroundStyle(theme.warning)
                         .multilineTextAlignment(.center)
                 }
 
@@ -54,7 +55,7 @@ struct WelcomeBackSheet: View {
         .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Theme.Spacing.md)
-        .background(RoundedRectangle(cornerRadius: 12).fill(Theme.Colors.surface))
+        .background(RoundedRectangle(cornerRadius: 12).fill(theme.surface))
     }
 
     private var breakdownLabel: String {

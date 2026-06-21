@@ -1,4 +1,4 @@
-# Achievements Spec (v2 — draft)
+# Achievements Spec (1.0 — draft)
 
 > **Status:** Draft on `plan/ui-overhaul`. Not authoritative until Phase 7 ships.
 
@@ -49,7 +49,7 @@ Additional milestones may be added before ship; IDs are stable strings in `Achie
 
 | Field | Value |
 |-------|-------|
-| Target release | v2.0 |
+| Target release | 1.0 |
 | Last verified | — |
 | Commit | — |
 | Code | `AchievementEngine.swift`, `Features/Awards/` |

@@ -1,9 +1,9 @@
-# UI Overhaul Plan — Peg Game Idle v2
+# 1.0 Polish Plan — Peg Game Idle
 
-> **Branch:** `plan/ui-overhaul` (cut from `main` after v1 merge)  
-> **Status:** Draft — planning only, not authoritative until phases ship  
+> **Branch:** `plan/ui-overhaul` (pre-release; no App Store build until **1.0.0** tag)  
+> **Status:** In progress — phases ship on this branch ahead of first release  
 > **Inspired by:** ScrollBloom (BloomScroll) production patterns — tab shell, designed sheets, toast feedback, achievements, onboarding, responsive layout  
-> **Goal:** Transform Peg Game Idle from a **functional v1 vertical slice** into a **polished, feature-rich idle product** without rewriting domain logic.
+> **Goal:** Transform Peg Game Idle from an **early vertical slice** into a **polished, feature-rich idle product** without rewriting domain logic.
 
 ---
 
@@ -17,7 +17,7 @@ This plan overhauls **presentation, navigation, meta-progression, and feedback**
 
 ---
 
-## Locked decisions (v2.0)
+## Locked decisions (1.0)
 
 | Decision | Value | Rationale |
 |----------|-------|-----------|
@@ -26,9 +26,9 @@ This plan overhauls **presentation, navigation, meta-progression, and feedback**
 | Navigation | 4-tab `TabView` + root orchestrator | BloomScroll-proven pattern |
 | Visual identity | Warm wood + peg orange, dark-mode-aware | Keep peg-game identity; don't clone garden theme |
 | Domain rewrite | **No** | `PegGameDomain` stays pure; extend only where UI needs new state |
-| Telemetry v2.0 | Still none | Hooks only; Phase 14 deferred |
-| Localization v2.0 | Still `en` only | String catalog prep in Phase 11 |
-| Board sizes in v2.0 | Classic 15-hole only | Size 6+ deferred to v2.1 unless Phase 9 finishes early |
+| Telemetry (1.0) | Still none | Hooks only; Phase 14 deferred |
+| Localization (1.0) | Still `en` only | String catalog prep in Phase 11 |
+| Board sizes in 1.0 | Upgrade unlocks sizes 5–8 | Daily puzzle stays classic 15-hole for 1.0 |
 | Tip jar | Hidden (`AppLinks.tipJar = nil`) | Unchanged |
 
 ---
@@ -39,7 +39,7 @@ This plan overhauls **presentation, navigation, meta-progression, and feedback**
 - iCloud sync (export/import yes; cloud no)
 - Multiplayer / social feed
 - Replacing peg solitaire with a different core game
-- Firebase / analytics in v2.0 ship
+- Firebase / analytics in 1.0 ship
 - Legal HTML pages (still Phase 15 — link placeholders OK)
 
 ---
@@ -158,9 +158,9 @@ specs/
 
 ### ViewModel strategy
 
-**Option A (recommended for v2.0):** Keep single `GameViewModel` as source of truth; inject via `@Environment(GameViewModel.self)` like ScrollBloom. Tab views are thin presenters.
+**Option A (recommended for 1.0):** Keep single `GameViewModel` as source of truth; inject via `@Environment(GameViewModel.self)` like ScrollBloom. Tab views are thin presenters.
 
-**Option B (v2.1 refactor):** Split into `PlayViewModel`, `EconomyViewModel`, `DailyViewModel` with a coordinator. Only if `GameViewModel` exceeds ~400 lines after overhaul.
+**Option B (post-1.0 refactor):** Split into `PlayViewModel`, `EconomyViewModel`, `DailyViewModel` with a coordinator. Only if `GameViewModel` exceeds ~400 lines after overhaul.
 
 ---
 
@@ -173,7 +173,7 @@ Each phase ends with: spec update · feature-inventory row · tests green · man
 **Deliverables**
 - [ ] This document reviewed and locked
 - [ ] `plan/ui-overhaul` branch pushed
-- [ ] `docs/agent-build-checklist.md` — add "v2 UI Overhaul" section referencing phases below
+- [ ] `docs/agent-build-checklist.md` — add "1.0 polish" section referencing phases below
 - [ ] `specs/README.md` — link new specs (stubs OK)
 
 **Exit criteria:** Team agrees on locked decisions and phase order.
@@ -209,7 +209,7 @@ Each phase ends with: spec update · feature-inventory row · tests green · man
 
 ### Phase 2 — App shell & tab navigation
 
-**Goal:** Introduce `RootView` + 4 tabs without losing any v1 behavior.
+**Goal:** Introduce `RootView` + 4 tabs without losing any existing behavior.
 
 **Spec:** `specs/system/app-shell.md`
 
@@ -231,7 +231,7 @@ Each phase ends with: spec update · feature-inventory row · tests green · man
 - `-ui_test_show_onboarding` (stub until Phase 5)
 - `-ui_test_offline_report` — force welcome-back sheet
 
-**Exit criteria:** All v1 flows reachable via tabs; CI smoke passes.
+**Exit criteria:** All core flows reachable via tabs; CI smoke passes.
 
 ---
 
@@ -419,7 +419,7 @@ func newlyUnlocked(state: GameState, event: GameEvent) -> [AchievementID]
 4. Disabled state when already solved today — show score/rank achieved
 5. Offline-safe — no network required
 
-**Optional v2.1:** Larger board daily variant — skip unless ahead of schedule
+**Optional post-1.0:** Larger board daily variant — skip unless ahead of schedule
 
 **Exit criteria:** Daily streak visible at a glance; calendar accurate to local timezone.
 
@@ -462,7 +462,7 @@ func newlyUnlocked(state: GameState, event: GameEvent) -> [AchievementID]
 
 ### Phase 12 — Accessibility hardening & responsive layout
 
-**Goal:** Close WCAG gate items open from v1.
+**Goal:** Close WCAG gate items open from early builds.
 
 **Spec:** Update `specs/system/accessibility.md` with evidence table
 
@@ -487,8 +487,8 @@ func newlyUnlocked(state: GameState, event: GameEvent) -> [AchievementID]
 1. Expand `GameViewModelTests` for achievements, onboarding flag, sheet presentation models
 2. UI tests: onboarding skip, tab navigation, buy upgrade, daily entry
 3. GitHub Actions — add UI test job if not already (simulator)
-4. Update `docs/feature-inventory.md` — full v2 row set
-5. Update `docs/agent-build-checklist.md` — v2 phases complete
+4. Update `docs/feature-inventory.md` — full 1.0 row set
+5. Update `docs/agent-build-checklist.md` — 1.0 phases complete
 6. `docs/release/2.0.0-checklist.md` — ship gate (TestFlight, screenshots, App Store copy)
 7. README — new screenshots, tab structure
 
@@ -496,7 +496,7 @@ func newlyUnlocked(state: GameState, event: GameEvent) -> [AchievementID]
 
 ---
 
-### Phase 14 — Deferred (post-v2.0)
+### Phase 14 — Deferred (post-1.0)
 
 | Item | Notes |
 |------|-------|
@@ -506,7 +506,7 @@ func newlyUnlocked(state: GameState, event: GameEvent) -> [AchievementID]
 | Legal HTML + GitHub Pages | AppLinks URLs |
 | Localization | String catalog already extracted |
 | Cosmetics / peg skins | Monetization optional |
-| iCloud sync | Export/import sufficient for v2 |
+| iCloud sync | Export/import sufficient for 1.0 |
 | macOS | Catalyst evaluation |
 
 ---
@@ -585,11 +585,11 @@ Keep tick, persistence, and domain calls centralized.
 ```
 main
  └── plan/ui-overhaul          ← this plan (docs only PR first)
-      └── feature/v2-design-system     (Phase 1)
-      └── feature/v2-app-shell         (Phase 2)
-      └── feature/v2-feedback          (Phase 3)
+      └── feature/1.0-design-system     (Phase 1)
+      └── feature/1.0-app-shell         (Phase 2)
+      └── feature/1.0-feedback          (Phase 3)
       ... (one branch per phase OR batch 1–3, 4–6, 7–9, 10–13)
-      └── release/v2.0.0               (integration + QA)
+      └── release/1.0.0               (integration + QA)
 ```
 
 **PR rules**
@@ -648,7 +648,7 @@ Copy patterns, not pixels:
 2. **Achievement multiplier cap** — uncapped +15% or soft cap? (Recommend: cap at +15%, tune in playtest.)
 3. **Sound design** — realistic wood clicks vs playful bloops? (Recommend: subtle wood tap + soft chime on rank.)
 4. **Daily calendar timezone** — device local vs UTC? (Existing domain uses local; keep.)
-5. **GameViewModel split** — defer to v2.1 unless file >400 lines after Phase 10.
+5. **GameViewModel split** — defer to post-1.0 unless file >400 lines after Phase 10.
 
 ---
 

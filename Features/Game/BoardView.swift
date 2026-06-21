@@ -4,12 +4,21 @@ import PegGameDomain
 /// Renders the triangular peg board with motion and routes input to the view model.
 struct BoardView: View {
     @Environment(GameViewModel.self) private var game
+    @Environment(\.themePalette) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    private var pegDiameter: CGFloat {
+        min(Theme.Metrics.pegDiameter, Theme.Metrics.pegDiameter * 5 / CGFloat(game.board.layout.size))
+    }
+
+    private var pegSpacing: CGFloat {
+        min(Theme.Metrics.pegSpacing, Theme.Metrics.pegSpacing * 5 / CGFloat(game.board.layout.size))
+    }
+
     var body: some View {
-        VStack(spacing: Theme.Metrics.pegSpacing) {
+        VStack(spacing: pegSpacing) {
             ForEach(0..<game.board.layout.size, id: \.self) { row in
-                HStack(spacing: Theme.Metrics.pegSpacing) {
+                HStack(spacing: pegSpacing) {
                     ForEach(0...row, id: \.self) { col in
                         holeView(Position(row: row, col: col))
                     }
@@ -19,7 +28,7 @@ struct BoardView: View {
         .padding()
         .background { PegBackground() }
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Peg board, \(game.pegsRemaining) pegs remaining")
+        .accessibilityLabel("\(game.boardLayoutName) board, \(game.pegsRemaining) pegs remaining")
     }
 
     @ViewBuilder
@@ -30,26 +39,47 @@ struct BoardView: View {
         let isAnimatingFrom = game.animatingJump?.from == position
         let isAnimatingTo = game.animatingJump?.to == position
         let isShaking = game.shakePosition == position
+        let isHintFrom = game.hintMove?.from == position
+        let isHintTo = game.hintMove?.to == position
+        let isCenterGoal = !game.isDailyMode && position == game.board.layout.centerPosition
         let dealDelay = dealDelay(for: position)
 
         Button {
             game.tap(position)
         } label: {
             Circle()
-                .fill(fillColor(hasPeg: hasPeg, isSelected: isSelected, isTarget: isTarget, isAnimatingFrom: isAnimatingFrom))
+                .fill(fillColor(
+                    hasPeg: hasPeg,
+                    isSelected: isSelected,
+                    isTarget: isTarget,
+                    isHintFrom: isHintFrom,
+                    isHintTo: isHintTo,
+                    isAnimatingFrom: isAnimatingFrom
+                ))
                 .overlay {
-                    if isTarget && !isAnimatingTo {
+                    if isHintFrom && hasPeg {
+                        Image(systemName: "star.fill")
+                            .imageScale(.small)
+                            .foregroundStyle(theme.prestige)
+                    } else if isHintTo && !hasPeg {
+                        Image(systemName: "lightbulb.fill")
+                            .imageScale(.small)
+                            .foregroundStyle(theme.warning)
+                            .symbolEffect(.pulse, options: .repeating, value: isHintTo)
+                    } else if isTarget && !isAnimatingTo {
                         Image(systemName: "arrow.down.to.line")
                             .imageScale(.small)
                             .foregroundStyle(.white)
                             .symbolEffect(.pulse, options: .repeating, value: isTarget)
                     } else if isSelected {
                         Circle().strokeBorder(.white, lineWidth: 3)
+                    } else if isCenterGoal {
+                        Circle().strokeBorder(theme.prestige.opacity(0.35), lineWidth: 2)
                     }
                 }
-                .frame(width: Theme.Metrics.pegDiameter, height: Theme.Metrics.pegDiameter)
+                .frame(width: pegDiameter, height: pegDiameter)
                 .scaleEffect(isSelected ? 1.08 : 1)
-                .shadow(color: isSelected ? Theme.Colors.pegSelected.opacity(0.6) : .clear, radius: 6)
+                .shadow(color: isSelected ? theme.pegSelected.opacity(0.6) : .clear, radius: 6)
                 .offset(x: isShaking ? 4 : 0)
                 .opacity(isAnimatingFrom ? 0.3 : 1)
                 .scaleEffect(isAnimatingTo ? 1.1 : 1)
@@ -57,8 +87,14 @@ struct BoardView: View {
         .buttonStyle(.plain)
         .simultaneousGesture(dragGesture(from: position))
         .accessibilityIdentifier("hole-\(position.row)-\(position.col)")
-        .accessibilityLabel(accessibilityLabel(hasPeg: hasPeg, isSelected: isSelected, isTarget: isTarget))
-        .accessibilityHint(hasPeg ? "Double-tap to select this peg" : isTarget ? "Double-tap to jump here" : "")
+        .accessibilityLabel(accessibilityLabel(
+            hasPeg: hasPeg,
+            isSelected: isSelected,
+            isTarget: isTarget,
+            isHintFrom: isHintFrom,
+            isHintTo: isHintTo
+        ))
+        .accessibilityHint(hasPeg ? "Double-tap to select this peg" : isTarget ? "Double-tap to jump here" : isHintTo ? "Hint landing hole" : "")
         .animation(.motionSafe(.easeOut(duration: 0.2), reduceMotion: reduceMotion), value: isSelected)
         .animation(.motionSafe(.easeInOut(duration: 0.08).repeatCount(3, autoreverses: true), reduceMotion: reduceMotion), value: isShaking)
         .modifier(DealAppearanceModifier(generation: game.boardDealGeneration, delay: dealDelay, reduceMotion: reduceMotion))
@@ -74,14 +110,30 @@ struct BoardView: View {
             }
     }
 
-    private func fillColor(hasPeg: Bool, isSelected: Bool, isTarget: Bool, isAnimatingFrom: Bool) -> Color {
-        if isAnimatingFrom { return Theme.Colors.holeEmpty }
-        if isSelected { return Theme.Colors.pegSelected }
-        if isTarget { return Theme.Colors.pegTarget }
-        return hasPeg ? Theme.Colors.peg : Theme.Colors.holeEmpty
+    private func fillColor(
+        hasPeg: Bool,
+        isSelected: Bool,
+        isTarget: Bool,
+        isHintFrom: Bool,
+        isHintTo: Bool,
+        isAnimatingFrom: Bool
+    ) -> Color {
+        if isAnimatingFrom { return theme.holeEmpty }
+        if isSelected { return theme.pegSelected }
+        if isHintFrom && hasPeg { return theme.pegSelected.opacity(0.85) }
+        if isTarget || isHintTo { return theme.pegTarget }
+        return hasPeg ? theme.peg : theme.holeEmpty
     }
 
-    private func accessibilityLabel(hasPeg: Bool, isSelected: Bool, isTarget: Bool) -> String {
+    private func accessibilityLabel(
+        hasPeg: Bool,
+        isSelected: Bool,
+        isTarget: Bool,
+        isHintFrom: Bool,
+        isHintTo: Bool
+    ) -> String {
+        if isHintFrom { return "Hint: jump this peg" }
+        if isHintTo { return "Hint landing hole" }
         if isSelected { return "Selected peg" }
         if isTarget { return "Empty landing hole" }
         return hasPeg ? "Peg" : "Empty hole"

@@ -14,6 +14,7 @@ public enum AchievementID: String, Codable, CaseIterable, Sendable, Hashable {
     case prestige5 = "prestige_5"
     case pegPoints1k = "peg_points_1k"
     case pegPoints1m = "peg_points_1m"
+    case centerPeg = "center_peg"
 }
 
 /// Catalog entry for a milestone. Icon is an SF Symbol name for the Features layer.
@@ -36,7 +37,7 @@ public enum AchievementCatalog {
     public static let all: [AchievementDefinition] = [
         AchievementDefinition(achievementID: .firstJump, title: "First Jump", description: "Make your first manual jump.", icon: "arrow.up.forward"),
         AchievementDefinition(achievementID: .firstBoard, title: "Board Cleared", description: "Finish your first board.", icon: "checkmark.circle"),
-        AchievementDefinition(achievementID: .genius, title: "Genius", description: "Finish a board with one peg left.", icon: "brain.head.profile"),
+        AchievementDefinition(achievementID: .genius, title: "Expert", description: "Finish a board with one peg left.", icon: "brain.head.profile"),
         AchievementDefinition(achievementID: .streak3, title: "Three-Day Streak", description: "Complete the Daily Puzzle three days in a row.", icon: "flame"),
         AchievementDefinition(achievementID: .streak7, title: "Week Warrior", description: "Complete the Daily Puzzle seven days in a row.", icon: "flame.fill"),
         AchievementDefinition(achievementID: .boards10, title: "Regular", description: "Complete 10 boards.", icon: "square.grid.3x3"),
@@ -46,6 +47,7 @@ public enum AchievementCatalog {
         AchievementDefinition(achievementID: .prestige5, title: "Veteran", description: "Prestige five times.", icon: "star.fill"),
         AchievementDefinition(achievementID: .pegPoints1k, title: "Thousand Points", description: "Earn 1,000 Peg Points lifetime.", icon: "dollarsign.circle"),
         AchievementDefinition(achievementID: .pegPoints1m, title: "Millionaire", description: "Earn 1,000,000 Peg Points lifetime.", icon: "banknote"),
+        AchievementDefinition(achievementID: .centerPeg, title: "Bullseye", description: "Finish with the center peg.", icon: "scope"),
     ]
 
     public static func definition(for id: AchievementID) -> AchievementDefinition? {
