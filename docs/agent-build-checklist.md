@@ -22,6 +22,15 @@ progress against it. Check boxes, add dates + commit hashes as phases complete.
 governance/spec index → system specs → feature specs → `docs/feature-inventory.md`
 (what ships today) → `docs/brainstorm.md` (maybe, not authoritative).
 
+## v2 UI overhaul (in progress)
+
+**Plan:** [`docs/ui-overhaul-plan.md`](ui-overhaul-plan.md) · **Branch:** `plan/ui-overhaul`
+
+13 phases: design system → tab shell → feedback/haptics → board motion → onboarding →
+designed sheets → achievements → upgrade polish → daily tab → prestige UX → launch splash →
+a11y hardening → CI/release. Domain stays mostly unchanged; presentation layer rebuilt
+using ScrollBloom patterns as reference.
+
 ## Architecture at a glance
 
 ```
