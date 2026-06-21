@@ -37,7 +37,9 @@ struct LaunchSplashOverlay<Content: View>: View {
     }
 
     private func runTransition() {
-        if ProcessInfo.processInfo.arguments.contains("-reset_state") || reduceMotion {
+        if ProcessInfo.processInfo.arguments.contains("-reset_state")
+            || ProcessInfo.processInfo.arguments.contains("-ui_test_skip_splash")
+            || reduceMotion {
             isActive = false
             return
         }

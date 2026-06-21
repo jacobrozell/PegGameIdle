@@ -62,15 +62,9 @@ struct BoardView: View {
                             .imageScale(.small)
                             .foregroundStyle(theme.prestige)
                     } else if isHintTo && !hasPeg {
-                        Image(systemName: "lightbulb.fill")
-                            .imageScale(.small)
-                            .foregroundStyle(theme.warning)
-                            .symbolEffect(.pulse, options: .repeating, value: isHintTo)
+                        landingGlyph("lightbulb.fill", tint: theme.warning, pulse: isHintTo)
                     } else if isTarget && !isAnimatingTo {
-                        Image(systemName: "arrow.down.to.line")
-                            .imageScale(.small)
-                            .foregroundStyle(.white)
-                            .symbolEffect(.pulse, options: .repeating, value: isTarget)
+                        landingGlyph("arrow.down.to.line", tint: .white, pulse: isTarget)
                     } else if isSelected {
                         Circle().strokeBorder(.white, lineWidth: 3)
                     } else if isCenterGoal {
@@ -141,6 +135,20 @@ struct BoardView: View {
 
     private func dealDelay(for position: Position) -> Double {
         Double(position.row * 3 + position.col) * 0.03
+    }
+
+    @ViewBuilder
+    private func landingGlyph(_ name: String, tint: Color, pulse: Bool) -> some View {
+        if reduceMotion {
+            Image(systemName: name)
+                .imageScale(.small)
+                .foregroundStyle(tint)
+        } else {
+            Image(systemName: name)
+                .imageScale(.small)
+                .foregroundStyle(tint)
+                .symbolEffect(.pulse, options: .repeating, value: pulse)
+        }
     }
 }
 

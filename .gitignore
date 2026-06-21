@@ -16,6 +16,13 @@ Package.resolved
 # macOS
 .DS_Store
 
+# Cursor MCP (local machine paths)
+.cursor/mcp.json
+.xcodebuildmcp/
+
+# MCP screenshot / scratch output
+tmp/
+
 # Secrets — never commit signing or service credentials.
 *.mobileprovision
 *.p12

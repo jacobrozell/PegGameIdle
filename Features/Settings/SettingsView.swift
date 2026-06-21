@@ -52,6 +52,7 @@ struct SettingsView: View {
                 }
 
                 Section("About") {
+                    LabeledContent("Version", value: AppVersion.display)
                     Link("Privacy Policy", destination: AppLinks.privacy)
                         .accessibilityIdentifier("settings-privacy-link")
                     Link("Support", destination: AppLinks.support)
@@ -73,11 +74,11 @@ struct SettingsView: View {
                     Text("Permanently deletes your Peg Points, upgrades, prestige, and streaks on this device.")
                 }
             }
-            .navigationTitle("Settings")
+            .navigationTitle(L10n.settingsTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button(L10n.done) { dismiss() }
                         .accessibilityIdentifier("settings-done-button")
                 }
             }

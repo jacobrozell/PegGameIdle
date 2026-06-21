@@ -27,14 +27,15 @@ struct OnboardingView: View {
                 .frame(minHeight: pageMinHeight)
 
                 HStack {
-                    Button("Skip") {
+                    Button(L10n.skip) {
                         finish()
                     }
                     .foregroundStyle(.secondary)
+                    .accessibilityIdentifier(A11yID.onboardingSkip)
 
                     Spacer()
 
-                    Button(page == pages.count - 1 ? "Get started" : "Next") {
+                    Button(page == pages.count - 1 ? L10n.getStarted : L10n.next) {
                         advance()
                     }
                     .font(.headline)

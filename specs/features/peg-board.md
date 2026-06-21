@@ -46,16 +46,16 @@ specced in `scoring.md`. See also `idle-economy.md`.
 - 44pt targets. Landing holes use a glyph, not color alone.
 
 ## Out of scope (1.0)
-- Board sizes other than classic (engine supports; UI does not).
-- Undo/redo, hints, seeded daily boards.
+- Daily puzzle on non-classic board sizes (main play supports sizes 5–8 via upgrade).
+- Multiplayer, Game Center leaderboards (layer post-1.0).
+
+Undo, hint, and drag-to-jump are in scope and shipped on the Play tab.
 
 ---
 
 ### Verification
 - Target release: 1.0
-- Last verified: 2026-06-20 (code review; **not run** — no Swift toolchain in
-  build environment)
-- Commit: _initial scaffold_
-- Primary code paths: `Sources/PegGameDomain/{Board,Move,BoardLayout,Position}.swift`,
-  `Features/Game/{GameViewModel,BoardView,GameView}.swift`
-- Tests: `Tests/PegGameDomainTests/BoardTests.swift`, `Tests/UI/GameUISmokeTests.swift`
+- Last verified: 2026-06-20
+- Primary code paths: `Sources/PegGameDomain/{Board,Move,BoardLayout,Position,BoardHint}.swift`,
+  `Features/Game/{GameViewModel,BoardView}.swift`, `Features/Play/PlayView.swift`
+- Tests: `Tests/PegGameDomainTests/BoardTests.swift`, `GameplayMechanicsTests.swift`, `Tests/UI/GameUISmokeTests.swift`

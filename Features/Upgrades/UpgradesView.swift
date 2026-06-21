@@ -151,6 +151,7 @@ struct UpgradeRow: View {
         }
         .buttonStyle(.plain)
         .disabled(!enabled)
+        .accessibilityIdentifier(A11yID.upgradeBuyPrefix + kind.rawValue + "-\(levels)")
         .accessibilityLabel("\(label) buy \(kind.displayName) for \(Int(cost)) Peg Points")
     }
 

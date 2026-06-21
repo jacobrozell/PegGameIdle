@@ -7,6 +7,7 @@ public struct StatsSnapshot: Equatable, Sendable {
     public let lifetimePegPointsEarned: Double
     public let totalPrestiges: Int
     public let totalPegsJumped: Int
+    public let dailyStreak: Int
     public let unlockedAchievementCount: Int
     public let achievementMultiplier: Double
 
@@ -16,6 +17,7 @@ public struct StatsSnapshot: Equatable, Sendable {
         lifetimePegPointsEarned = state.lifetimePegPointsEarned
         totalPrestiges = state.totalPrestiges
         totalPegsJumped = state.totalPegsJumped
+        dailyStreak = state.dailyStreak
         unlockedAchievementCount = state.unlockedAchievements.count
         achievementMultiplier = state.achievementMultiplier
     }

@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   build-and-test:
-    name: Domain tests + app build
+    name: Domain + app + UI tests
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +39,7 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-      # Build the app and run the hosted unit tests (core features + drag).
+      # Build the app and run hosted unit + UI smoke tests.
       # iPhone 16 ships with the latest-stable Xcode runtime used above.
       - name: Build & test app
         run: |

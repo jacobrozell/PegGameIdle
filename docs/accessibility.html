@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Accessibility — Peg Game Idle</title>
+  <style>
+    :root { color-scheme: light dark; }
+    body { font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+           max-width: 42rem; margin: 0 auto; padding: 2rem 1.25rem; }
+    h1 { font-size: 2rem; }
+    nav { margin: 1rem 0 1.5rem; }
+    nav a { margin-right: 1rem; }
+    footer { margin-top: 3rem; color: #888; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="support.html">Support</a>
+    <a href="privacy.html">Privacy</a>
+  </nav>
+  <h1>Accessibility</h1>
+  <p>Peg Game Idle targets WCAG 2.1 AA on core flows: play the board, buy upgrades,
+  complete the daily puzzle, and manage settings.</p>
+
+  <h2>Supported features</h2>
+
+  <h3>VoiceOver</h3>
+  <ul>
+    <li>Each board hole is a button with state-specific labels (peg, empty, selected, landing target).</li>
+    <li>Tab bar, currency header, upgrade rows, and settings toggles expose accessibility identifiers.</li>
+    <li>Toasts post accessibility announcements when they appear.</li>
+  </ul>
+
+  <h3>Tap and drag input</h3>
+  <p>Jump pegs by dragging peg → landing hole, or by two-step tap (select peg, tap hole). Both paths use the same rules.</p>
+
+  <h3>Dynamic Type</h3>
+  <p>Primary UI uses system text styles. Stats and upgrade rows use
+  <code>ViewThatFits</code> layouts to adapt at larger text sizes.</p>
+
+  <h3>Reduced Motion</h3>
+  <p>When iOS Reduce Motion is on, the app disables or shortens:</p>
+  <ul>
+    <li>Launch splash crossfade</li>
+    <li>Ambient background particles</li>
+    <li>Peg jump arcs and deal animations</li>
+    <li>Toast slide transitions and prestige celebration effects</li>
+  </ul>
+  <p>You can also turn off ambient particles in Settings → Feedback → Ambient motion.</p>
+
+  <h3>Color and themes</h3>
+  <p>Four color themes (Slate, Forest, Ocean, Sunset) adjust accent and surface
+  colors. Landing holes use a distinct glyph, not color alone, to indicate valid targets.</p>
+
+  <h3>Touch targets</h3>
+  <p>Interactive controls aim for at least 44×44 pt minimum touch targets.</p>
+
+  <h2>Known limitations</h2>
+  <ul>
+    <li>Some compact stat labels may truncate at the largest Dynamic Type sizes; the stacked layout is used when horizontal space is tight.</li>
+    <li>Locked achievements show as "???" until unlocked — by design for discovery.</li>
+  </ul>
+
+  <h2>Feedback</h2>
+  <p>If accessibility blocks a core task, please email
+  <a href="mailto:jacob.rozell83@gmail.com?subject=Peg%20Game%20Idle%20Accessibility">jacob.rozell83@gmail.com</a>
+  with your device, iOS version, and VoiceOver or Dynamic Type settings.</p>
+
+  <footer><p>Last updated 2026-06-20.</p></footer>
+</body>
+</html>

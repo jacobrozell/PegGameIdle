@@ -79,6 +79,7 @@ public final class GameViewModel {
     public var stats: StatsSnapshot { StatsSnapshot(state: state) }
     public var ambientParticlesEnabled: Bool { settingsStore.ambientParticlesEnabled }
     public var boardLayoutName: String { board.layout.displayName }
+    public var legalMoveCount: Int { board.legalMoves().count }
     public var canUndo: Bool { !undoStack.isEmpty && !board.isGameOver }
     public var canHint: Bool { animatingJump == nil && !board.isGameOver && !board.legalMoves().isEmpty }
     public var hasActiveHint: Bool { hintMove != nil }
@@ -522,6 +523,12 @@ public final class GameViewModel {
 
     private func prepareUITestHooks() {
         let args = ProcessInfo.processInfo.arguments
+        if args.contains("-reset_state"), !args.contains("-ui_test_show_onboarding") {
+            state.hasSeenOnboarding = true
+        }
+        if args.contains("-ui_test_rich_state") {
+            state.pegPoints = 10_000
+        }
         if args.contains("-ui_test_show_onboarding") {
             state.hasSeenOnboarding = false
         }

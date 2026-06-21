@@ -24,24 +24,24 @@ struct RootView: View {
 
         TabView(selection: $game.selectedTab) {
             PlayView(showSettings: $showSettings)
-                .tabItem { Label("Play", systemImage: "circle.grid.3x3.fill") }
+                .tabItem { Label(L10n.tabPlay, systemImage: "circle.grid.3x3.fill") }
                 .tag(AppTab.play)
                 .accessibilityIdentifier(A11yID.tabPlay)
 
             UpgradesView()
-                .tabItem { Label("Upgrades", systemImage: "sparkles") }
+                .tabItem { Label(L10n.tabUpgrades, systemImage: "sparkles") }
                 .tag(AppTab.upgrades)
                 .modifier(OptionalTabBadge(count: game.affordableUpgradeCount))
                 .accessibilityLabel(upgradesTabLabel)
                 .accessibilityIdentifier(A11yID.tabUpgrades)
 
             DailyView()
-                .tabItem { Label("Daily", systemImage: "calendar") }
+                .tabItem { Label(L10n.tabDaily, systemImage: "calendar") }
                 .tag(AppTab.daily)
                 .accessibilityIdentifier(A11yID.tabDaily)
 
             AwardsView()
-                .tabItem { Label("Awards", systemImage: "trophy.fill") }
+                .tabItem { Label(L10n.tabAwards, systemImage: "trophy.fill") }
                 .tag(AppTab.awards)
                 .accessibilityIdentifier(A11yID.tabAwards)
         }
@@ -108,7 +108,7 @@ struct RootView: View {
 
     private var upgradesTabLabel: String {
         let count = game.affordableUpgradeCount
-        guard count > 0 else { return "Upgrades" }
-        return "Upgrades, \(count) affordable"
+        guard count > 0 else { return L10n.tabUpgrades }
+        return "\(L10n.tabUpgrades), \(count) affordable"
     }
 }

@@ -489,7 +489,7 @@ func newlyUnlocked(state: GameState, event: GameEvent) -> [AchievementID]
 3. GitHub Actions — add UI test job if not already (simulator)
 4. Update `docs/feature-inventory.md` — full 1.0 row set
 5. Update `docs/agent-build-checklist.md` — 1.0 phases complete
-6. `docs/release/2.0.0-checklist.md` — ship gate (TestFlight, screenshots, App Store copy)
+6. `docs/release/1.0.0-checklist.md` — ship gate (TestFlight, screenshots, App Store copy)
 7. README — new screenshots, tab structure
 
 **Exit criteria:** CI green; release checklist drafted.

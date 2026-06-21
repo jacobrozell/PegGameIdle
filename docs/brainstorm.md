@@ -41,17 +41,14 @@ brainstorm on making scoring reward skill and giving daily reasons to return.
 ### Board lifecycle
 - **Auto-deal:** when no legal moves remain, show a short end-of-board tally
   (pegs left → rank → payout), then deal a fresh board automatically.
-- Cracker Barrel ranks for flavor: 1 left = genius, 2 = purty smart,
-  3 = just plain dumb, 4+ = eg-no-ra-moose.
+- Brand-neutral ranks in app: Expert (1 peg), Sharp (2), Fair (3), Rough (4+).
 
-### Completion multiplier (proposed numbers — tune later)
-
-| Pegs left | Rank | Board payout |
-|-----------|------|--------------|
-| 1 | Genius | ×5 |
-| 2 | Purty smart | ×3 |
-| 3 | Just plain dumb | ×2 |
-| 4 | Eg-no-ra-moose | ×1.25 |
+| Pegs left | Rank (app) | Board payout |
+|-----------|------------|--------------|
+| 1 | Expert | ×5 |
+| 2 | Sharp | ×3 |
+| 3 | Fair | ×2 |
+| 4 | Rough | ×1.25 |
 | 5+ | — | ×1 (jump points only) |
 
 - **Streak/combo (optional layer):** consecutive finishes with ≤2 pegs left

@@ -126,10 +126,10 @@ struct PlayView: View {
                 Label("\(game.boardLayoutName) · \(game.pegsRemaining) pegs left", systemImage: "square.grid.3x3")
                     .foregroundStyle(.secondary)
             } else if game.streakCount > 1 {
-                Label("\(game.streakCount)× streak — \(game.pegsRemaining) pegs left", systemImage: "flame.fill")
+                Label("\(game.streakCount)× streak · \(game.pegsRemaining) pegs · \(game.legalMoveCount) moves", systemImage: "flame.fill")
                     .foregroundStyle(theme.warning)
             } else {
-                Text("\(game.pegsRemaining) pegs remaining")
+                Text("\(game.pegsRemaining) pegs · \(game.legalMoveCount) moves")
                     .foregroundStyle(.secondary)
             }
         }

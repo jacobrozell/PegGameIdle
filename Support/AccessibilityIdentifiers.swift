@@ -21,8 +21,10 @@ enum A11yID {
     static let dailyPractice = "daily-practice-button"
 
     static let upgradeRowPrefix = "upgrade-"
+    static let upgradeBuyPrefix = "upgrade-buy-"
     static let achievementRowPrefix = "achievement-"
 
+    static let onboardingSkip = "onboarding-skip"
     static let onboardingNext = "onboarding-next"
     static let onboardingGetStarted = "onboarding-get-started"
     static let welcomeBackCollect = "welcome-back-collect"

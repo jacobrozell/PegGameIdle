@@ -74,19 +74,13 @@ struct PrestigeMeter: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-            HStack {
-                Label("Prestige", systemImage: "star.circle.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(theme.prestige)
-                Spacer()
-                if game.canPrestige {
-                    Text("\(game.pendingPrestige) ready")
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(theme.success)
-                } else {
-                    Text("\(Int(game.prestigeProgressFraction * 100))%")
-                        .font(.caption.monospacedDigit())
-                        .foregroundStyle(.secondary)
+            ViewThatFits(in: .horizontal) {
+                prestigeHeaderRow
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("Prestige", systemImage: "star.circle.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(theme.prestige)
+                    prestigeStatusText
                 }
             }
             ProgressView(value: game.canPrestige ? 1 : game.prestigeProgressFraction)
@@ -97,6 +91,31 @@ struct PrestigeMeter: View {
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier(A11yID.prestigeMeter)
         .accessibilityLabel(prestigeAccessibilityLabel)
+    }
+
+    private var prestigeHeaderRow: some View {
+        HStack {
+            Label("Prestige", systemImage: "star.circle.fill")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(theme.prestige)
+            Spacer(minLength: 8)
+            prestigeStatusText
+        }
+    }
+
+    @ViewBuilder
+    private var prestigeStatusText: some View {
+        if game.canPrestige {
+            Text("\(game.pendingPrestige) ready")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(theme.success)
+                .lineLimit(1)
+                .minimumScaleFactor(0.85)
+        } else {
+            Text("\(Int(game.prestigeProgressFraction * 100))%")
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
     }
 
     private var prestigeAccessibilityLabel: String {

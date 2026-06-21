@@ -8,26 +8,38 @@ final class GameUISmokeTests: XCTestCase {
         app.launchArguments += ["-reset_state", "-disable_telemetry"]
         app.launch()
 
-        XCTAssertTrue(app.tabBars.buttons["tab-play"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.tabBars.buttons["tab-upgrades"].exists)
-        XCTAssertTrue(app.tabBars.buttons["tab-daily"].exists)
-        XCTAssertTrue(app.tabBars.buttons["tab-awards"].exists)
+        XCTAssertTrue(app.tabBars.buttons["Play"].waitForExistence(timeout: 8))
+        XCTAssertTrue(app.tabBars.buttons["Upgrades"].exists)
+        XCTAssertTrue(app.tabBars.buttons["Daily"].exists)
+        XCTAssertTrue(app.tabBars.buttons["Awards"].exists)
 
-        XCTAssertTrue(app.staticTexts["peg-points-value"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.otherElements["status-line"].exists || app.staticTexts["status-line"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["peg-points-value"].firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.descendants(matching: .any)["status-line"].firstMatch.exists)
         XCTAssertTrue(app.buttons["new-board-button"].exists)
         XCTAssertTrue(app.buttons["undo-button"].exists)
         XCTAssertTrue(app.buttons["hint-button"].exists)
         XCTAssertTrue(app.buttons["hole-0-0"].exists)
 
-        app.tabBars.buttons["tab-upgrades"].tap()
-        XCTAssertTrue(app.buttons["upgrade-pegValue"].waitForExistence(timeout: 3))
+        app.tabBars.buttons["Upgrades"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["upgrade-pegValue"].firstMatch.waitForExistence(timeout: 5))
 
-        app.tabBars.buttons["tab-daily"].tap()
-        XCTAssertTrue(app.buttons["daily-play-button"].waitForExistence(timeout: 3))
+        app.tabBars.buttons["Daily"].tap()
+        XCTAssertTrue(app.buttons["daily-play-button"].waitForExistence(timeout: 5))
 
-        app.tabBars.buttons["tab-awards"].tap()
-        XCTAssertTrue(app.staticTexts["Awards"].waitForExistence(timeout: 3))
+        app.tabBars.buttons["Awards"].tap()
+        XCTAssertTrue(app.navigationBars["Awards"].waitForExistence(timeout: 5))
+    }
+
+    func testSettingsOpensFromPlayTab() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-reset_state", "-disable_telemetry"]
+        app.launch()
+
+        XCTAssertTrue(app.buttons["settings-button"].waitForExistence(timeout: 8))
+        app.buttons["settings-button"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.switches["settings-haptics-toggle"].exists)
+        XCTAssertTrue(app.switches["settings-particles-toggle"].exists)
     }
 
     func testOnboardingSkipReachesPlayTab() {
@@ -35,8 +47,20 @@ final class GameUISmokeTests: XCTestCase {
         app.launchArguments += ["-reset_state", "-ui_test_show_onboarding"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["Skip"].waitForExistence(timeout: 5))
-        app.buttons["Skip"].tap()
+        XCTAssertTrue(app.buttons["onboarding-skip"].waitForExistence(timeout: 8))
+        app.buttons["onboarding-skip"].tap()
         XCTAssertTrue(app.buttons["new-board-button"].waitForExistence(timeout: 5))
+    }
+
+    func testBuyUpgradeWhenRichState() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-reset_state", "-ui_test_rich_state"]
+        app.launch()
+
+        app.tabBars.buttons["Upgrades"].tap()
+        let buy = app.buttons["upgrade-buy-pegValue-1"]
+        XCTAssertTrue(buy.waitForExistence(timeout: 8))
+        buy.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["peg-points-value"].firstMatch.waitForExistence(timeout: 5))
     }
 }

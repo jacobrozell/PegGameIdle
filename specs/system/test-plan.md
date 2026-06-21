@@ -7,9 +7,9 @@
   view-model logic: tap/drag interaction, jump scoring, Auto-Jumper isolation,
   upgrades, daily mode, reset. Run via `xcodebuild test` on a simulator; fast
   because they drive the model, not the UI.
-- **UI smoke** (`Tests/UI`) — XCUITest proving the core screen launches and key
-  controls (by accessibility identifier) exist. Requires a simulator; not in PR
-  CI yet (nightly candidate).
+- **UI smoke** (`Tests/UI`, target `PegGameIdleUITests`) — XCUITest: tab bar,
+  play controls, settings sheet, onboarding skip, upgrade purchase. Runs in
+  `PegGameIdleCI` on iPhone simulator in CI.
 
 ## What domain tests cover today
 - Board: hole/peg counts, opening moves, legal/illegal/non-adjacent jumps, win
@@ -23,13 +23,14 @@
 ## CI scheme
 - `.github/workflows/ci.yml` (macos-14, pinned latest-stable Xcode): runs
   `swift test` (domain), then `xcodegen generate`, then `xcodebuild test` for the
-  `PegGameIdleCI` scheme (app build + hosted unit tests) on a discovered iPhone
-  simulator.
+  `PegGameIdleCI` scheme (app build + unit + UI smoke tests) on iPhone 16 simulator.
 
 ## Launch arguments (for deterministic UI runs)
 - `-reset_state` — clear persisted progress before launch.
 - `-disable_telemetry` — no analytics in tests (telemetry is off in 1.0 anyway).
-- (Future) `-enable_full_product_surface` — expose gated features for CI/dogfood.
+- `-ui_test_show_onboarding` — force onboarding sheet on launch.
+- `-ui_test_rich_state` — grant 10,000 Peg Points for upgrade UI tests.
+- `-ui_test_offline_report` — inject welcome-back sheet on launch.
 
 `-reset_state` and `-disable_telemetry` are honored in `AppDependencies.live()`:
 the former wipes persisted progress before launch, the latter forces telemetry

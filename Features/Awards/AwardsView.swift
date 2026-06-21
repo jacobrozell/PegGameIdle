@@ -95,6 +95,7 @@ struct StatsSection: View {
                     statRow("Best rank", game.stats.bestRank?.displayName ?? "—")
                     statRow("Lifetime Peg Points", NumberFormatting.compact(game.stats.lifetimePegPointsEarned))
                     statRow("Prestiges", "\(game.stats.totalPrestiges)")
+                    statRow("Daily streak", "\(game.stats.dailyStreak) day\(game.stats.dailyStreak == 1 ? "" : "s")")
                     statRow("Pegs jumped", "\(game.stats.totalPegsJumped)")
                 }
                 .font(.subheadline)

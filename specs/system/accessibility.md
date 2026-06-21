@@ -5,37 +5,50 @@ Target: **WCAG 2.1 AA**. No launch with open critical failures on core flows.
 ## Principles baked into the design system
 - **Touch targets ≥ 44×44 pt** (`Theme.Metrics.minTouchTarget`). Pegs and
   upgrade rows meet this.
-- **Never color-only.** The selected peg gets a white ring; landing holes show
-  an `arrow.down.to.line` glyph in addition to the green tint.
-- **Drag has a non-drag equivalent.** Drag-to-jump is the tactile primary input,
-  but the tap-select path (tap peg → tap landing hole) performs every jump and is
-  fully operable by VoiceOver and Switch Control. Drag is layered as a
-  `simultaneousGesture` so it never blocks the button's accessibility action.
+- **Never color-only.** Selected peg: white ring. Landing holes: `arrow.down.to.line`
+  glyph + tint. Hints: star / lightbulb icons.
+- **Drag has a non-drag equivalent.** Tap peg → tap landing hole; same domain path.
 - **Every control ships** `accessibilityLabel`, `accessibilityHint`, and
-  `accessibilityIdentifier` (the latter doubles as the UI-test contract).
-- **Dynamic Type:** use semantic text styles; avoid fixed font sizes in body
-  copy. (Largest-size audit still open — see tracker.)
+  `accessibilityIdentifier` (UI-test contract in `Support/AccessibilityIdentifiers.swift`).
+- **Dynamic Type:** semantic text styles; `ViewThatFits` on `CurrencyHeader`,
+  `UpgradeRow`, `PrestigeMeter`, achievement rows.
+- **Reduce Motion:** splash, particles, peg arcs/deal, toast slide, board pulse
+  glyphs, prestige celebration respect `accessibilityReduceMotion` and Settings
+  → Ambient motion.
 
 ## Per-screen tracker
 
-| Screen | VoiceOver | Dynamic Type (AXXXL) | Contrast (light/dark) | Orientation | Status |
-|--------|-----------|----------------------|-----------------------|-------------|--------|
-| Game (board + header + upgrades) | labels/hints/ids in code; **manual pass pending** | not audited | not measured | iPhone portrait; iPad portrait stacked; iPad landscape two-column (`AdaptiveLayout`, unit-tested) | 🟡 engineering pass only |
+| Screen | VoiceOver | Dynamic Type | Contrast | Orientation | Status |
+|--------|-----------|--------------|----------|-------------|--------|
+| Play (board + controls) | ids + labels in code; manual pass pending | `ViewThatFits` header/meter | Slate evidence in [`../../docs/accessibility/contrast-evidence.md`](../../docs/accessibility/contrast-evidence.md) | iPhone portrait; iPad side-by-side | 🟡 |
+| Upgrades | row labels + buy buttons | action row wraps | same | portrait / iPad | 🟡 |
+| Daily | calendar cells labeled | card stacks | same | portrait / iPad | 🟡 |
+| Awards | locked/unlocked labels | achievement rows adapt | same | portrait / iPad | 🟡 |
+| Settings | toggles + links | Form | same | sheet | 🟡 |
+| Onboarding | combined page labels; Skip/Next ids | ScrollView + scaled emoji | same | sheet | 🟡 |
 
-Legend: 🟡 code-level a11y present, manual verification outstanding.
+Legend: 🟡 engineering pass + partial evidence; manual VoiceOver audit still open.
 
 ## Identifier conventions (UI-test contract)
+- Tabs: `tab-play`, `tab-upgrades`, `tab-daily`, `tab-awards`
 - Holes: `hole-{row}-{col}`
 - Peg Points value: `peg-points-value`
 - Status line: `status-line`
-- New board: `new-board-button`
-- Daily Puzzle: `daily-puzzle-button`
-- Prestige: `prestige-button`
-- Upgrade rows: `upgrade-{kind.rawValue}`
+- Undo / hint: `undo-button`, `hint-button`, `clear-hint-button`
+- New board / daily exit: `new-board-button`
+- Daily: `daily-play-button`, `daily-view-board-button`, `daily-practice-button`
+- Prestige: `prestige-button`, `prestige-meter`
+- Upgrade rows: `upgrade-{kind}`; buy: `upgrade-buy-{kind}-{levels}`
+- Onboarding: `onboarding-skip`, `onboarding-next`, `onboarding-get-started`
+- Settings: `settings-button`, `settings-haptics-toggle`, `settings-particles-toggle`
 
-## Open items before claiming a11y in App Store
-- [ ] Manual VoiceOver pass → dated doc in `accessibility/audits/`
-- [ ] Largest Dynamic Type pass (header + upgrades must not clip)
-- [ ] Contrast evidence (peg vs board wood; cost text vs background) light + dark
-- [ ] Reduce Motion respected once animations are added
-- [ ] Orientation matrix once iPad layout lands
+## Open items before App Store
+- [ ] Manual VoiceOver pass → `docs/accessibility/voiceover-audit.md`
+- [ ] Largest Dynamic Type device pass (iPhone SE + iPad)
+- [ ] Forest / Ocean / Sunset contrast spot-check
+- [ ] Hosted legal pages live on GitHub Pages
+
+## Verification
+- Target release: 1.0
+- Last verified: 2026-06-20 (code + contrast doc for Slate)
+- Primary code paths: `Features/Game/BoardView.swift`, `Features/Shell/RootView.swift`, `Support/DynamicTypeLayout.swift`

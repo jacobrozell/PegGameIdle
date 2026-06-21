@@ -1,8 +1,8 @@
 # Peg Game Idle
 
-An iOS idle game built on the classic **Cracker Barrel triangle peg game** — but
-interactive: every peg you jump earns **Peg Points**, an **Auto-Jumper** keeps
-earning while you're away, and **upgrades** make the loop spin faster.
+An iOS idle game built on **classic triangle peg solitaire** — jump pegs to earn
+**Peg Points**, let the **Auto-Jumper** earn while you're away, buy **upgrades**,
+**prestige** for permanent multipliers, and tackle a shared **Daily Puzzle** each day.
 
 This README is the build/run entry point. Product behavior lives in
 [`specs/`](specs/README.md); what actually ships is in
@@ -25,28 +25,30 @@ The `.xcodeproj` is generated and git-ignored. Generate it, then open:
 ```bash
 xcodegen generate
 open PegGameIdle.xcodeproj
-# or: xcodebuild build -scheme PegGameIdleCI \
-#       -destination 'platform=iOS Simulator,name=iPhone 15'
+# CI scheme (build + unit + UI smoke):
+xcodebuild test -scheme PegGameIdleCI \
+  -destination 'platform=iOS Simulator,name=iPhone 16'
 ```
 
-## Project layout
+## App structure
 ```
 App/          @main + composition root (AppDependencies)
-Features/     SwiftUI screens + @Observable view models
-DesignSystem/ Theme tokens (color, metrics, 44pt targets)
-Data/         GameStateRepository protocol + impls
-Sources/PegGameDomain/   PURE game logic (no SwiftUI) — the SwiftPM package
+Features/     SwiftUI — Play · Upgrades · Daily · Awards tabs
+DesignSystem/ Theme tokens, color themes, reusable components
+Data/         GameStateRepository + SettingsStore
+Sources/PegGameDomain/   PURE game logic (SwiftPM package)
 Tests/        PegGameDomainTests (swift test) + UI smoke (XCUITest)
-specs/ docs/  behavior contracts + reality + build checklist
+specs/ docs/  behavior contracts + release checklists
 ```
 
 ## Status
-Early scaffold: domain layer + first vertical slice (play board → earn → persist
-→ offline reconcile). See
-[`docs/agent-build-checklist.md`](docs/agent-build-checklist.md) for the phase
-progress log and known gaps.
+Pre-release polish on branch `plan/ui-overhaul`: tab shell, designed sheets,
+achievements, onboarding, haptics/sound, four color themes, undo/hint, board size
+upgrade, export/import. **No App Store release until the `1.0.0` tag.**
 
-> ⚠️ The SwiftUI app target has **not yet been built** — the scaffold was
-> authored in a Linux environment without an Xcode toolchain. First step on a
-> Mac: `swift test`, then `xcodegen generate` and build the CI scheme; fix any
-> compile drift before adding features.
+See [`docs/agent-build-checklist.md`](docs/agent-build-checklist.md) for phase
+progress and [`docs/release/1.0.0-checklist.md`](docs/release/1.0.0-checklist.md)
+for the ship gate.
+
+Legal/support pages (GitHub Pages): [`docs/privacy.html`](docs/privacy.html),
+[`docs/support.html`](docs/support.html), [`docs/accessibility.html`](docs/accessibility.html).

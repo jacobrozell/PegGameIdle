@@ -7,7 +7,7 @@ Pre-release polish: [`../ui-overhaul-plan.md`](../ui-overhaul-plan.md) on `plan/
 ## 1.0 App Store (when ready)
 
 - [ ] **Tag `1.0.0`** — first public release marker
-- [ ] **GitHub Pages legal URLs** — privacy, support, accessibility ([`../feature-inventory.md`](../feature-inventory.md) Phase 15)
+- [ ] **GitHub Pages legal URLs** — enable Pages on repo `/docs` if not live ([`../privacy.html`](../privacy.html))
 - [ ] **App Store Connect** — listing + 1024 icon
 - [ ] **Device smoke** — manual play, daily puzzle, prestige, offline welcome-back
 - [ ] **SwiftLint + CI** — lint job green

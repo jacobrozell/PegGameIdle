@@ -33,8 +33,8 @@
 | AppLinks registry (privacy/support/accessibility, tip jar hidden) | ✅ shipped | — | `Support/AppLinks.swift` |
 | CI (domain tests + app build on push) | ✅ shipped | `specs/system/test-plan.md` | `.github/workflows/ci.yml` |
 | Game Center leaderboards (fewest pegs) | ⛔ planned | backlog | daily board is deterministic; ready to layer on |
-| Legal HTML pages + GitHub Pages hosting | ⛔ planned | — | AppLinks URLs point here (Phase 15) |
-| Localization (multi-locale) | ⛔ planned | — | en strings inline |
+| Legal HTML pages + GitHub Pages hosting | ✅ shipped | — | `docs/privacy.html`, `docs/support.html`, `docs/accessibility.html` |
+| Localization (multi-locale) | 🟡 partial | — | `Localizable.xcstrings` scaffold; tab bar + settings wired |
 | Telemetry / analytics | ⛔ planned (1.0 = none) | — | — |
 | iCloud sync | ⛔ planned | backlog | export/import only for 1.0 |
 

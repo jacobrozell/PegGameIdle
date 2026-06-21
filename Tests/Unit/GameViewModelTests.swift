@@ -211,4 +211,10 @@ final class GameViewModelTests: XCTestCase {
         vm.undoLastMove()
         XCTAssertEqual(vm.pegsRemaining, 14)
     }
+
+    func testLegalMoveCountMatchesBoard() {
+        let vm = makeViewModel()
+        XCTAssertEqual(vm.legalMoveCount, vm.board.legalMoves().count)
+        XCTAssertGreaterThan(vm.legalMoveCount, 0)
+    }
 }
