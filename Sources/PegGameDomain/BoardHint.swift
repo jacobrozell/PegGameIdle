@@ -1,9 +1,8 @@
 import Foundation
 
-/// Suggests a legal move for the human player (greedy strategy, deterministic).
+/// Suggests a legal move on a path to a perfect solve (one peg left), when one exists.
 public enum BoardHint {
     public static func suggestedMove(on board: Board) -> Move? {
-        var rng = SystemRandomNumberGenerator()
-        return AutoPlayer(strategy: .greedy).nextMove(on: board, using: &rng)
+        BoardSolver.suggestedMove(on: board)
     }
 }

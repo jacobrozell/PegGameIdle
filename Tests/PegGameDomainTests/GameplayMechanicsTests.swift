@@ -27,6 +27,19 @@ final class GameplayMechanicsTests: XCTestCase {
         XCTAssertTrue(board.isLegal(hint!))
     }
 
+    func testFollowingHintsFromClassicStartReachesOnePeg() {
+        var board = Board(layout: .classic, empty: Position(row: 0, col: 0))
+        var step = 0
+        while let hint = BoardHint.suggestedMove(on: board) {
+            XCTAssertTrue(board.isLegal(hint), "Illegal hint at step \(step): \(hint)")
+            board.apply(hint)
+            step += 1
+            XCTAssertLessThanOrEqual(step, 13)
+        }
+        XCTAssertTrue(board.isGameOver)
+        XCTAssertEqual(board.pegCount, 1, "Hints should lead to a perfect solve, not \(board.pegCount) pegs")
+    }
+
     func testRevertManualJumpUndoesEconomy() {
         var state = GameState(pegPoints: 10, totalPegsJumped: 5, manualJumps: 3, lifetimePegPointsEarned: 10)
         let reward = state.reward(forJumping: 1)
